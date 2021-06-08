@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct Document {
+struct Document: Identifiable, Codable {
+    var id: ObjectIdentifier
+    
     var URL: URL // Used for both local and remote resources; if we download the document its URL may change to point to the local filesystem.
     let type: DocType
     var remote: Bool // If the file is remote then we allow users to edit the title; if the file is local then edititng the title will edit the file on disk.

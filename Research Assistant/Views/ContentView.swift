@@ -10,6 +10,7 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @ObservedObject var directoryViewModel: DirectoryViewModel
     
     //    @FetchRequest(
     //        sortDescriptors: [NSSortDescriptor(keyPath: \Document.timestamp, ascending: true)],
@@ -53,6 +54,15 @@ struct ContentView: View {
                     }
                     
                     Divider()
+                    
+                    List(directoryViewModel.contents) { path in
+                        
+                        
+                    }
+                    
+                    
+                    
+                    
                     
                     //                    ForEach(docs) { item in
                     //                        Text("test")
