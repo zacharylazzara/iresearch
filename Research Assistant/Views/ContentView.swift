@@ -41,7 +41,7 @@ struct ContentView: View {
                             TextField("Search", text: $searchTerm)
                         }
                         
-                        Button(action: home) {
+                        Button(action: search) {
                             Text("\(Image(systemName: "doc.text.magnifyingglass")) Advanced Search")
                         }
                     }
@@ -49,23 +49,23 @@ struct ContentView: View {
                     Divider()
                     
                     Group {
-                        Button(action: home) {
+                        Button(action: importDocs) {
                             Text("\(Image(systemName: "tray.and.arrow.down.fill")) Import Documents")
                         }
                         
-                        Button(action: home) {
+                        Button(action: citations) {
                             Text("\(Image(systemName: "text.quote")) Generate Citations")
                         }
                         
-                        Button(action: doc) {
+                        Button(action: notes) {
                             Text("\(Image(systemName: "rectangle.and.paperclip")) Notes")
                         }
                         
-                        Button(action: home) {
+                        Button(action: bookmarks) {
                             Text("\(Image(systemName: "bookmark.fill")) Bookmarks")
                         }
                         
-                        Button(action: home) {
+                        Button(action: archive) {
                             Text("\(Image(systemName: "archivebox.fill")) Archive")
                         }
                     }
@@ -76,7 +76,7 @@ struct ContentView: View {
                         Text("Directories").foregroundColor(.gray)
                         
                         // TODO: Anchor this to bottom of screen (might need to use a ZStack and VStack, and put it outside the list; not sure yet)
-                        Button(action: home) {
+                        Button(action: create) {
                             Text("\(Image(systemName: "folder.badge.plus")) Create Directory")
                         }
                     }
@@ -100,7 +100,7 @@ struct ContentView: View {
             .navigationBarTitle("Library")
             .toolbar(content: {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: home) {
+                    Button(action: settings) {
                         Image(systemName: "gear")
                         Text("Settings")
                     }
@@ -159,8 +159,43 @@ struct ContentView: View {
         //        }
     }
     
-    private func home() {
-        self.title = "Home"
+    private func settings() {
+        self.title = "Settings"
+        self.selection = 0
+    }
+    
+    private func search() {
+        self.title = "Advanced Search"
+        self.selection = 0
+    }
+    
+    private func importDocs() {
+        self.title = "Import"
+        self.selection = 0
+    }
+    
+    private func citations() {
+        self.title = "Generate Citations"
+        self.selection = 0
+    }
+    
+    private func notes() {
+        self.title = "Notes"
+        self.selection = 0
+    }
+    
+    private func bookmarks() {
+        self.title = "Bookmarks"
+        self.selection = 0
+    }
+    
+    private func archive() {
+        self.title = "Archive"
+        self.selection = 0
+    }
+    
+    private func create() {
+        self.title = "Create Directory"
         self.selection = 0
     }
     
