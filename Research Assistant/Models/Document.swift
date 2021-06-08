@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Document: Identifiable, Codable {
+struct Document: Identifiable { //, Codable {
     var id: ObjectIdentifier
     
     var URL: URL // Used for both local and remote resources; if we download the document its URL may change to point to the local filesystem.

@@ -10,7 +10,7 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @ObservedObject var directoryViewModel: DirectoryViewModel
+    //@ObservedObject var directoryViewModel: DirectoryViewModel
     
     //    @FetchRequest(
     //        sortDescriptors: [NSSortDescriptor(keyPath: \Document.timestamp, ascending: true)],
@@ -34,30 +34,51 @@ struct ContentView: View {
                 
                 
                 List { // TODO: we might want two lists put in a VStack to make this work better
-                    HStack() {
-                        Text("\(Image(systemName: "doc.text.magnifyingglass"))")
-                        TextField("Search", text: $searchTerm)
+                    
+                    Group {
+                        HStack() {
+                            Text("\(Image(systemName: "magnifyingglass"))")
+                            TextField("Search", text: $searchTerm)
+                        }
+                        
+                        Button(action: home) {
+                            Text("\(Image(systemName: "doc.text.magnifyingglass")) Advanced Search")
+                        }
                     }
                     
                     Divider()
                     
-                    Button(action: home) {
-                        Text("\(Image(systemName: "house.fill")) Home")
-                    }
-                    
-                    Button(action: home) {
-                        Text("\(Image(systemName: "books.vertical.fill")) Repositories")
-                    }
-                    
-                    Button(action: doc) {
-                        Text("\(Image(systemName: "note.text")) Notes")
+                    Group {
+                        Button(action: home) {
+                            Text("\(Image(systemName: "tray.and.arrow.down.fill")) Import Documents")
+                        }
+                        
+                        Button(action: home) {
+                            Text("\(Image(systemName: "text.quote")) Generate Citations")
+                        }
+                        
+                        Button(action: doc) {
+                            Text("\(Image(systemName: "rectangle.and.paperclip")) Notes")
+                        }
+                        
+                        Button(action: home) {
+                            Text("\(Image(systemName: "bookmark.fill")) Bookmarks")
+                        }
+                        
+                        Button(action: home) {
+                            Text("\(Image(systemName: "archivebox.fill")) Archive")
+                        }
                     }
                     
                     Divider()
                     
-                    List(directoryViewModel.contents) { path in
+                    Group {
+                        Text("Directories").foregroundColor(.gray)
                         
-                        
+                        // TODO: Anchor this to bottom of screen (might need to use a ZStack and VStack, and put it outside the list; not sure yet)
+                        Button(action: home) {
+                            Text("\(Image(systemName: "folder.badge.plus")) Create Directory")
+                        }
                     }
                     
                     
@@ -80,7 +101,7 @@ struct ContentView: View {
             .toolbar(content: {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: home) {
-                        Image(systemName: "gearshape.fill")
+                        Image(systemName: "gear")
                         Text("Settings")
                     }
                 }
