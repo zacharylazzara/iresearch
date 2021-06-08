@@ -16,7 +16,9 @@ struct ContentView: View {
     //        animation: .default)
     //    private var docs: FetchedResults<Document>
     
-    @State var searchTerm = ""
+    @State private var searchTerm: String = ""
+    @State private var selection: Int?
+    @State private var title: String = "Home"
     
     var body: some View {
         NavigationView {
@@ -46,11 +48,9 @@ struct ContentView: View {
                         Text("\(Image(systemName: "books.vertical.fill")) Repositories")
                     }
                     
-                    Button(action: home) {
+                    Button(action: doc) {
                         Text("\(Image(systemName: "note.text")) Notes")
                     }
-                    
-                    
                     
                     Divider()
                     
@@ -77,21 +77,37 @@ struct ContentView: View {
             })
             
             VStack(alignment: .leading) {
-                PDFKitRepresentedView(viewDoc())
+                // TODO: maybe we should use a view model for this? Since we'll be loading the data through the view model after all, so need to generate the links anyway.
+                
+                
+                //NavigationLink(destination: Text("Home"), tag: 0, selection: $selection) { HomeView() }.hidden().navigationViewStyle(StackNavigationViewStyle())
+                HomeView()
+                NavigationLink(destination: Text("Doc"), tag: 1, selection: $selection) { PDFKitRepresentedView(viewDoc()) }.hidden().navigationBarBackButtonHidden(true)
+                //.navigationViewStyle(StackNavigationViewStyle())
             }
-            .navigationBarTitle(Text(docTitle()!), displayMode: .inline)
+            .navigationBarTitle(Text(title), displayMode: .inline)
             .navigationBarItems(
                 trailing: HStack {
-                    NavigationLink( // TODO: we want to enable note taking here; perhaps we should use this to hide or unhide our notes?
-                        destination: PDFKitRepresentedView(viewDoc()),//ContentView(),
-                        label: {
-                            Text("\(Image(systemName: "square.and.pencil"))")
-                        })//.foregroundColor(.red)
+//                    switch selection {
+//                    case 1:
+//                        NavigationLink( // TODO: we want to enable note taking here; perhaps we should use this to hide or unhide our notes?
+//                            destination: PDFKitRepresentedView(viewDoc()),//ContentView(),
+//                            label: {
+//                                Text("\(Image(systemName: "square.and.pencil"))")
+//                            }
+//                        )//.foregroundColor(.red)
+//                    default:
+//                        NavigationLink(
+//                            destination: PDFKitRepresentedView(viewDoc()),//ContentView(),
+//                            label: {
+//                                Text("\(Image(systemName: "square"))")
+//                            }
+//                        )//.foregroundColor(.red)
+//                    }
                 })
             //.navigationBarBackButtonHidden(true)
         }
-        //.navigationViewStyle(StackNavigationViewStyle()) // seems to start us in the library view? doesn't seem to work how I want it to though
-        
+        //.navigationViewStyle(StackNavigationViewStyle())
         
         
         
@@ -113,10 +129,16 @@ struct ContentView: View {
     }
     
     private func home() {
-        
+        self.title = "Home"
+        self.selection = 0
     }
     
-    private func docTitle() -> String? {
+    private func doc() {
+        self.title = docTitle()!
+        self.selection = 1
+    }
+    
+    private func docTitle() -> String? { // TODO: we'll need to not hardcode this soon
         return URL(string: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf")?.lastPathComponent
     }
     
