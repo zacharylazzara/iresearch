@@ -13,25 +13,12 @@
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="X47-rx-isc" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController title="Image" id="ObA-dk-sSI" userLabel="PDF" customClass="ActionViewController" customModule="Library_Extension" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="zMn-AG-sqS">
+                    <view key="view" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zMn-AG-sqS">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="528"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <navigationBar contentMode="scaleToFill" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="NOA-Dm-cuz">
-                                <rect key="frame" x="0.0" y="44" width="320" height="44"/>
-                                <items>
-                                    <navigationItem id="3HJ-uW-3hn">
-                                        <barButtonItem key="leftBarButtonItem" title="Done" style="done" id="WYi-yp-eM6">
-                                            <connections>
-                                                <action selector="done" destination="ObA-dk-sSI" id="Qdu-qn-U6V"/>
-                                            </connections>
-                                        </barButtonItem>
-                                    </navigationItem>
-                                </items>
-                            </navigationBar>
-                            <wkWebView userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="d7p-ga-c7y" customClass="PDFView">
+                            <wkWebView userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d7p-ga-c7y" customClass="PDFView">
                                 <rect key="frame" x="0.0" y="88" width="320" height="440"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <wkWebViewConfiguration key="configuration" allowsAirPlayForMediaPlayback="NO" allowsPictureInPictureMediaPlayback="NO">
                                     <dataDetectorTypes key="dataDetectorTypes"/>
@@ -39,13 +26,30 @@
                                     <wkPreferences key="preferences" javaScriptEnabled="NO"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
+                            <navigationBar contentMode="scaleToFill" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="NOA-Dm-cuz">
+                                <rect key="frame" x="0.0" y="44" width="320" height="44"/>
+                                <items>
+                                    <navigationItem id="3HJ-uW-3hn">
+                                        <barButtonItem key="rightBarButtonItem" title="Add to Library" style="done" id="Goc-UI-hdw">
+                                            <connections>
+                                                <action selector="add" destination="ObA-dk-sSI" id="tSe-wo-3cZ"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="VVe-Uw-JpX"/>
+                        <viewLayoutGuide key="safeArea" id="T1o-1p-uvA"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="VVe-Uw-JpX" firstAttribute="trailing" secondItem="NOA-Dm-cuz" secondAttribute="trailing" id="A05-Pj-hrr"/>
-                            <constraint firstItem="NOA-Dm-cuz" firstAttribute="leading" secondItem="VVe-Uw-JpX" secondAttribute="leading" id="HxO-8t-aoh"/>
-                            <constraint firstItem="NOA-Dm-cuz" firstAttribute="top" secondItem="VVe-Uw-JpX" secondAttribute="top" id="we0-1t-bgp"/>
+                            <constraint firstItem="NOA-Dm-cuz" firstAttribute="top" secondItem="T1o-1p-uvA" secondAttribute="top" id="56z-3o-AzU"/>
+                            <constraint firstItem="d7p-ga-c7y" firstAttribute="leading" secondItem="T1o-1p-uvA" secondAttribute="leading" id="D8M-zO-g7D"/>
+                            <constraint firstItem="NOA-Dm-cuz" firstAttribute="top" secondItem="T1o-1p-uvA" secondAttribute="top" id="Y34-G1-pxp"/>
+                            <constraint firstItem="d7p-ga-c7y" firstAttribute="bottom" secondItem="T1o-1p-uvA" secondAttribute="bottom" id="jrc-aj-CFd"/>
+                            <constraint firstItem="NOA-Dm-cuz" firstAttribute="trailing" secondItem="T1o-1p-uvA" secondAttribute="trailing" id="n3p-BX-Ah0"/>
+                            <constraint firstItem="d7p-ga-c7y" firstAttribute="trailing" secondItem="T1o-1p-uvA" secondAttribute="trailing" id="sGK-cN-lPc"/>
+                            <constraint firstItem="d7p-ga-c7y" firstAttribute="top" secondItem="NOA-Dm-cuz" secondAttribute="bottom" id="vHw-Vc-YeJ"/>
+                            <constraint firstItem="NOA-Dm-cuz" firstAttribute="leading" secondItem="T1o-1p-uvA" secondAttribute="leading" id="vbO-pZ-4eG"/>
                         </constraints>
                     </view>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>

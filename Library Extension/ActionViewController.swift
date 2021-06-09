@@ -10,8 +10,6 @@ import MobileCoreServices
 import PDFKit
 
 class ActionViewController: UIViewController {
-
-    //@IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var pdfView: PDFView!
 
     override func viewDidLoad() {
@@ -42,10 +40,14 @@ class ActionViewController: UIViewController {
         }
     }
 
-    @IBAction func done() {
+    @IBAction func add() {
+        
+        
+        
+        
+        
         // Return any edited content to the host app.
         // This template doesn't do anything, so we just echo the passed in items.
         self.extensionContext!.completeRequest(returningItems: self.extensionContext!.inputItems, completionHandler: nil)
     }
-
 }
