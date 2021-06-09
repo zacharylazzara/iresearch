@@ -23,36 +23,37 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            ZStack(alignment: .leading) {
-                // TODO: we might want a list here, and then we'll load the library separate from the sidebar? But we'll see
-                SidebarView()
-            }
-            
-           
-            
-            VStack(alignment: .leading) {
-               
-            }
-            .navigationBarTitle(Text(title), displayMode: .inline)
-            .navigationBarItems(
-                trailing: HStack {
-//                    switch selection {
-//                    case 1:
-//                        NavigationLink( // TODO: we want to enable note taking here; perhaps we should use this to hide or unhide our notes?
-//                            destination: PDFKitRepresentedView(viewDoc()),//ContentView(),
-//                            label: {
-//                                Text("\(Image(systemName: "square.and.pencil"))")
-//                            }
-//                        )//.foregroundColor(.red)
-//                    default:
-//                        NavigationLink(
-//                            destination: PDFKitRepresentedView(viewDoc()),//ContentView(),
-//                            label: {
-//                                Text("\(Image(systemName: "square"))")
-//                            }
-//                        )//.foregroundColor(.red)
-//                    }
-                })
+            SidebarView()
+//            ZStack(alignment: .leading) {
+//                // TODO: we might want a list here, and then we'll load the library separate from the sidebar? But we'll see
+//                SidebarView()
+//            }
+//
+//
+//
+//            VStack(alignment: .leading) {
+//
+//            }
+//            .navigationBarTitle(Text(title), displayMode: .inline)
+//            .navigationBarItems(
+//                trailing: HStack {
+////                    switch selection {
+////                    case 1:
+////                        NavigationLink( // TODO: we want to enable note taking here; perhaps we should use this to hide or unhide our notes?
+////                            destination: PDFKitRepresentedView(viewDoc()),//ContentView(),
+////                            label: {
+////                                Text("\(Image(systemName: "square.and.pencil"))")
+////                            }
+////                        )//.foregroundColor(.red)
+////                    default:
+////                        NavigationLink(
+////                            destination: PDFKitRepresentedView(viewDoc()),//ContentView(),
+////                            label: {
+////                                Text("\(Image(systemName: "square"))")
+////                            }
+////                        )//.foregroundColor(.red)
+////                    }
+//                })
             //.navigationBarBackButtonHidden(true)
         }
         //.navigationViewStyle(StackNavigationViewStyle())

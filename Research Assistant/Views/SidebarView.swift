@@ -60,6 +60,8 @@ struct SidebarView: View {
     private func settings() {
         self.title = "Settings"
         self.selection = 0
+        
+        // TODO: needs to open the navigation link somehow (alternatively we can just edit settings within the sidebar by putting the navlink in the toolbar
     }
     
     private func search() {
