@@ -24,97 +24,14 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ZStack(alignment: .leading) {
-                // TODO: This is where all the navigation links will be to other features of the app? This is the side bar (maybe we want to have our library listed in here and use the main slide for our PDF?
-                
-                // TODO: maybe the library should be the home page somehow? Or at the very least it should remember where you left off.
-                
-                //                Button(action: home) {
-                //                    Text("\(Image(systemName: "house.fill")) Home")
-                //                }
-                
-                
-                List { // TODO: we might want two lists put in a VStack to make this work better
-                    
-                    Group {
-                        HStack() {
-                            Text("\(Image(systemName: "magnifyingglass"))")
-                            TextField("Search", text: $searchTerm)
-                        }
-                        
-                        Button(action: search) {
-                            Text("\(Image(systemName: "doc.text.magnifyingglass")) Advanced Search")
-                        }
-                    }
-                    
-                    Divider()
-                    
-                    Group {
-                        Button(action: importDocs) {
-                            Text("\(Image(systemName: "tray.and.arrow.down.fill")) Import Documents")
-                        }
-                        
-                        Button(action: citations) {
-                            Text("\(Image(systemName: "text.quote")) Generate Citations")
-                        }
-                        
-                        Button(action: notes) {
-                            Text("\(Image(systemName: "rectangle.and.paperclip")) Notes")
-                        }
-                        
-                        Button(action: bookmarks) {
-                            Text("\(Image(systemName: "bookmark.fill")) Bookmarks")
-                        }
-                        
-                        Button(action: archive) {
-                            Text("\(Image(systemName: "archivebox.fill")) Archive")
-                        }
-                    }
-                    
-                    Divider()
-                    
-                    Group {
-                        Text("Directories").foregroundColor(.gray)
-                        
-                        // TODO: Anchor this to bottom of screen (might need to use a ZStack and VStack, and put it outside the list; not sure yet)
-                        Button(action: create) {
-                            Text("\(Image(systemName: "folder.badge.plus")) Create Directory")
-                        }
-                    }
-                    
-                    
-                    
-                    
-                    
-                    //                    ForEach(docs) { item in
-                    //                        Text("test")
-                    //                    }
-                }
-                
-                //                List {
-                //                    ForEach(items) { item in
-                //                        Text("Test \(item.timestamp!, formatter: itemFormatter)")
-                //                    }
-                //                    .onDelete(perform: deleteDocs)
-                //                }
+                // TODO: we might want a list here, and then we'll load the library separate from the sidebar? But we'll see
+                SidebarView()
             }
-            .navigationBarTitle("Library")
-            .toolbar(content: {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: settings) {
-                        Image(systemName: "gear")
-                        Text("Settings")
-                    }
-                }
-            })
+            
+           
             
             VStack(alignment: .leading) {
-                // TODO: maybe we should use a view model for this? Since we'll be loading the data through the view model after all, so need to generate the links anyway.
-                
-                
-                //NavigationLink(destination: Text("Home"), tag: 0, selection: $selection) { HomeView() }.hidden().navigationViewStyle(StackNavigationViewStyle())
-                HomeView()
-                NavigationLink(destination: Text("Doc"), tag: 1, selection: $selection) { PDFKitRepresentedView(viewDoc()) }.hidden().navigationBarBackButtonHidden(true)
-                //.navigationViewStyle(StackNavigationViewStyle())
+               
             }
             .navigationBarTitle(Text(title), displayMode: .inline)
             .navigationBarItems(
@@ -166,37 +83,37 @@ struct ContentView: View {
     
     private func search() {
         self.title = "Advanced Search"
-        self.selection = 0
+        self.selection = 1
     }
     
     private func importDocs() {
         self.title = "Import"
-        self.selection = 0
+        self.selection = 2
     }
     
     private func citations() {
         self.title = "Generate Citations"
-        self.selection = 0
+        self.selection = 3
     }
     
     private func notes() {
         self.title = "Notes"
-        self.selection = 0
+        self.selection = 4
     }
     
     private func bookmarks() {
         self.title = "Bookmarks"
-        self.selection = 0
+        self.selection = 5
     }
     
     private func archive() {
         self.title = "Archive"
-        self.selection = 0
+        self.selection = 6
     }
     
     private func create() {
         self.title = "Create Directory"
-        self.selection = 0
+        //self.selection = 0
     }
     
     private func doc() {
