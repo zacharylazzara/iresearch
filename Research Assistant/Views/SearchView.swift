@@ -8,8 +8,12 @@
 import SwiftUI
 
 struct SearchView: View {
+    @State private var searchTerm: String = ""
     var body: some View {
-        Text("Search")
+        HStack() {
+            Text("\(Image(systemName: "magnifyingglass"))")
+            TextField("Search", text: $searchTerm)
+        }
     }
 }
 

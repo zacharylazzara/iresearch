@@ -9,7 +9,10 @@ import SwiftUI
 
 struct SettingsView: View {
     var body: some View {
-        Text("Settings")
+        VStack(alignment: .leading) {
+            
+        }
+        .navigationTitle("Settings")
     }
 }
 

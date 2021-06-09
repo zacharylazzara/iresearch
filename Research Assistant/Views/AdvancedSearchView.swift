@@ -1,5 +1,5 @@
 //
-//  CitationGeneratorView.swift
+//  AdvancedSearchView.swift
 //  Research Assistant
 //
 //  Created by Zachary Lazzara on 2021-06-09.
@@ -7,17 +7,17 @@
 
 import SwiftUI
 
-struct CitationGeneratorView: View {
+struct AdvancedSearchView: View {
     var body: some View {
         VStack(alignment: .leading) {
             
         }
-        .navigationTitle("Citation Generator")
+        .navigationTitle("Advanced Search")
     }
 }
 
-struct CitationGeneratorView_Previews: PreviewProvider {
+struct AdvancedSearchView_Previews: PreviewProvider {
     static var previews: some View {
-        CitationGeneratorView()
+        AdvancedSearchView()
     }
 }

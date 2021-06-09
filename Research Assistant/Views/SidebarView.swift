@@ -8,20 +8,14 @@
 import SwiftUI
 
 struct SidebarView: View {
-    //@ObservedObject var documents: [Document]()
-    
-    @State private var searchTerm: String = ""
-    @State private var selection: Int? // TODO: needs to bind? the parent view needs access to these variables I think
+    @State private var selection: Int? = 1 // TODO: needs to bind? the parent view needs access to these variables I think
     @State private var title: String = "Home"
     
     var body: some View {
         List {
             Group {
-                HStack() {
-                    Text("\(Image(systemName: "magnifyingglass"))")
-                    TextField("Search", text: $searchTerm)
-                }
-                NavigationLink(destination: SearchView(), tag: 1, selection: $selection) { Text("\(Image(systemName: "doc.text.magnifyingglass")) Advanced Search") }
+                SearchView() // TODO: seems to be some problems with having this as its own view, need to investigate further
+                NavigationLink(destination: AdvancedSearchView(), tag: 1, selection: $selection) { Text("\(Image(systemName: "doc.text.magnifyingglass")) Advanced Search") }
             }
             
             Divider()
@@ -36,14 +30,7 @@ struct SidebarView: View {
             
             Divider()
             
-            Group {
-                Text("Directories").foregroundColor(.gray)
-                
-                // TODO: Anchor this to bottom of screen (might need to use a ZStack and VStack, and put it outside the list; not sure yet)
-                Button(action: create) {
-                    Text("\(Image(systemName: "folder.badge.plus")) Create Directory")
-                }
-            }
+            DirectoryView()
         }
         .navigationBarTitle("Library")
         .listStyle(SidebarListStyle())
@@ -94,10 +81,7 @@ struct SidebarView: View {
         self.selection = 6
     }
     
-    private func create() {
-        self.title = "Create Directory"
-        // This will just add a directory in place which will then be renamed by the user as they'd rename any other folder
-    }
+    
 }
 
 struct SidebarView_Previews: PreviewProvider {

@@ -9,7 +9,10 @@ import SwiftUI
 
 struct ArchiveView: View {
     var body: some View {
-        Text("Archive")
+        VStack(alignment: .leading) {
+            
+        }
+        .navigationTitle("Archive")
     }
 }
 

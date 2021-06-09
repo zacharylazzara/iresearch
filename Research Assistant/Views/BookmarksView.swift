@@ -12,7 +12,10 @@ import SwiftUI
 
 struct BookmarksView: View {
     var body: some View {
-        Text("Bookmarks")
+        VStack(alignment: .leading) {
+            
+        }
+        .navigationTitle("Bookmarks")
     }
 }
 
