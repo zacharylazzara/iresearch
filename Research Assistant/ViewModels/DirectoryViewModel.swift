@@ -41,7 +41,6 @@ class DirectoryViewModel: ObservableObject {
     
     public func load() -> [Document] {
         var documents = [Document]()
-        var directories = [String]()
         
         print("Loading files from: \(papersPath)")
         do {
@@ -51,16 +50,19 @@ class DirectoryViewModel: ObservableObject {
             for file in files {
                 let url = URL(fileURLWithPath: papersPath + file)
                 
+                let docType: DocType
+                
                 if let f = try? url.resourceValues(forKeys: [.isDirectoryKey]) {
                     if f.isDirectory! {
                         print("Directory: \(file)")
-                        
-                        directories.append(file)
+                        docType = DocType.DIR
+                        //directories.append(file)
                     } else {
                         print("Document: \(file)")
-                        
-                        documents.append(Document(url, type: DocType.PDF, remote: false, title: file, added: Date(), accessed: Date(), tags: [], flagged: false))
+                        docType = DocType.PDF
                     }
+                    
+                    documents.append(Document(url, type: docType, remote: false, title: file, added: Date(), accessed: Date(), tags: [], flagged: false))
                 } else {
                     print("Problem loading file: \(file)")
                 }

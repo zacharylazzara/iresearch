@@ -22,7 +22,7 @@ struct DirectoryView: View {
              */
             
             // TODO: we shouldn't use PDFKit if we have a directory, so we'll need to separate these somehow (probably in the ViewModel
-            NavigationLink(destination: PDFKitRepresentedView(dirVM.getData(document: doc)!)) { Text("\(Image(systemName: (doc.type == DocType.DIR ? "folder" : "doc.text"))) \(doc.title)") }
+            NavigationLink(destination: (doc.type == DocType.DIR ? nil : PDFKitRepresentedView(dirVM.getData(document: doc)!))) { Text("\(Image(systemName: (doc.type == DocType.DIR ? "folder" : "doc.text"))) \(doc.title)") }
         }
         
         Button(action: dirVM.create) {
