@@ -625,7 +625,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Research Assistant/Research Assistant.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Research Assistant/Views/Preview Content\"";
-				DEVELOPMENT_TEAM = 94NYJ2UF5C;
+				DEVELOPMENT_TEAM = T6HP5R9Y7Y;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Research Assistant/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -649,7 +649,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Research Assistant/Research Assistant.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Research Assistant/Views/Preview Content\"";
-				DEVELOPMENT_TEAM = 94NYJ2UF5C;
+				DEVELOPMENT_TEAM = T6HP5R9Y7Y;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Research Assistant/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
