@@ -8,29 +8,35 @@
 import SwiftUI
 
 struct DirectoryView: View {
-    //@ObservedObject var documents: [Document]()
-    let fm = FileManager.default
-    //@State var documents = [Document]()
-    
     var body: some View {
-        
         Text("Directories").foregroundColor(.gray)
         
-        //fm.contentsOfDirectory(atPath: AppGroup.library.containerURL)
-        
         ForEach(load()) { doc in
-            Text(doc.title)
+            NavigationLink(destination: PDFKitRepresentedView(getData(document: doc)!)) { Text("\(Image(systemName: "doc.text")) \(doc.title)") }
+
         }
-        
-        
         
         Button(action: create) {
             Text("\(Image(systemName: "folder.badge.plus")) Create Directory")
         }
     }
     
+    
+    private func getData(document: Document) -> Data? {
+        var data: Data?
+        
+        do {
+            data = try Data(contentsOf: document.id)
+        } catch {
+            print(error)
+        }
+        
+        return data
+    }
+    
     // TODO: we should move these functions into a ViewModel!
     private func load() -> [Document] {
+        let fm = FileManager.default
         var documents = [Document]()
         
         let appGroupPath = fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.path
@@ -47,7 +53,7 @@ struct DirectoryView: View {
                 print("Found: \(files)")
                             
                 for file in files {
-                    documents.append(Document(URL(string: papersPath + file)!, type: DocType.PDF, remote: false, title: file, added: Date(), accessed: Date(), tags: [], flagged: false))
+                    documents.append(Document(URL(string: "file://" + papersPath + file)!, type: DocType.PDF, remote: false, title: file, added: Date(), accessed: Date(), tags: [], flagged: false))
                     
                     // TODO: we need to get the date the file was created and accessed from the file manager (or remove these variables if we won't be using them)
                     // We also need to load tags and the document state and other such things from somewhere (maybe CoreData? but then we can have a sync problem if the underlying files change)

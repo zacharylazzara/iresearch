@@ -30,7 +30,7 @@ struct SidebarView: View {
             
             Divider()
             
-            DirectoryView()
+            DirectoryView() // TODO: we might need to take the selection from the directory view (or pass the selection into it?)
         }
         .navigationBarTitle("Library")
         .listStyle(SidebarListStyle())
