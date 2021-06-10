@@ -5,7 +5,7 @@
 //  Created by Zachary Lazzara on 2021-06-08.
 //
 
-enum DocType {
+enum FileType {
     case PDF
     case DIR
     

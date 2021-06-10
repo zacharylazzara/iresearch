@@ -13,7 +13,7 @@ struct DirectoryView: View {
     var body: some View {
         Text("Directories").foregroundColor(.gray)
         
-        ForEach(dirVM.load()) { doc in
+        ForEach(dirVM.files) { file in
             /* TODO:
              Need to support directories; when we click one we should navigate into it, with a back button to go up a level.
              We also need to display the root directory (the Papers directory), with child elements offset from it. Whenever we navigate to a new directory, we put it in place of the parent directory and keep elements offset.
@@ -22,10 +22,10 @@ struct DirectoryView: View {
              */
             
             // TODO: we shouldn't use PDFKit if we have a directory, so we'll need to separate these somehow (probably in the ViewModel
-            NavigationLink(destination: (doc.type == DocType.DIR ? nil : PDFKitRepresentedView(dirVM.getData(document: doc)!))) { Text("\(Image(systemName: (doc.type == DocType.DIR ? "folder" : "doc.text"))) \(doc.title)") }
+            NavigationLink(destination: (file.type == FileType.DIR ? nil : PDFKitRepresentedView(dirVM.getData(file: file)!))) { Text("\(Image(systemName: (file.type == FileType.DIR ? "folder" : "doc.text"))) \(file.name)") }
         }
         
-        Button(action: dirVM.create) {
+        Button(action: dirVM.createDirWrapper) {
             Text("\(Image(systemName: "folder.badge.plus")) Create Directory")
         }
     }

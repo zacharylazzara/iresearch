@@ -7,31 +7,34 @@
 
 import Foundation
 
-struct Document: Identifiable {
+struct File: Identifiable {
     let id: URL // The ID will double as the URL to the document
     
-    let type: DocType
-    var remote: Bool // If the file is remote then we allow users to edit the title; if the file is local then edititng the title will edit the file on disk.
-    var title: String // Will be the .lastPathComponent of the URL by default, but we may want to allow users to edit this to make documents easier to identify.
+    // TODO: need to support moving documents to new directories
     
-    let added: Date
-    var accessed: Date // When the user last read the file
+    let type: FileType
+    var remote: Bool // If the file is remote then we allow users to edit the title; if the file is local then edititng the title will edit the file on disk.
+    var name: String // Will be the .lastPathComponent of the URL by default, but we may want to allow users to edit this to make documents easier to identify.
+    
+    let added: Date?
+    var accessed: Date? // When the user last read the file
     
     var tags: [String]
     var flagged: Bool
     
     var archived: Bool
     
-    init(_ url: URL, type: DocType, remote: Bool, title: String, added: Date, accessed: Date, tags: [String], flagged: Bool) {
+    init(_ url: URL, type: FileType, name: String) {
         self.id = url
-        //self.url = url
         self.type = type
-        self.remote = remote
-        self.title = title
-        self.added = added
-        self.accessed = accessed
-        self.tags = tags
-        self.flagged = flagged
+        self.name = name
+        
+        // TODO: figure out what to do with these later
+        self.added = nil
+        self.accessed = nil
+        self.tags = []
+        self.flagged = false
+        self.remote = false
         self.archived = false
     }
     

@@ -18,84 +18,89 @@ class DirectoryViewModel: ObservableObject {
     private let libraryPath: String
     private let papersPath: String
     
+    @Published public var files: [File]
+    
     init() {
-        fm = FileManager.default
-        appGroupPath = fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.path + "/"
-        libraryPath = appGroupPath + "Library/"
-        papersPath = libraryPath + "Papers/"
+        self.fm = FileManager.default
+        self.appGroupPath = self.fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.path + "/"
+        self.libraryPath = self.appGroupPath + "Library/"
+        self.papersPath = self.libraryPath + "Papers/"
+        self.files = [File]()
         
-        if !fm.fileExists(atPath: appGroupPath) && fm.fileExists(atPath: libraryPath) {
+        if !self.fm.fileExists(atPath: self.appGroupPath) && self.fm.fileExists(atPath: self.libraryPath) {
             print("Unable to find AppGroup or Library directories!")
             
             // TODO: we need to display an error to the user (maybe throw an exception?
             
-        } else if !fm.fileExists(atPath: papersPath) {
-            print("\(papersPath) does not exist! Creating directory...")
+        } else if !self.fm.fileExists(atPath: self.papersPath) {
+            print("\(self.papersPath) does not exist! Creating directory...")
             do {
-                try fm.createDirectory(atPath: papersPath, withIntermediateDirectories: true, attributes: nil)
+                try self.fm.createDirectory(atPath: self.papersPath, withIntermediateDirectories: true, attributes: nil)
             } catch {
                 print(error)
             }
+        } else {
+            load() // TODO: we may need to figure out a way to make files observe this? right now it'll only run once and won't update data when data is added
         }
     }
     
-    public func load() -> [Document] {
-        var documents = [Document]()
-        
+    private func load() {
         print("Loading files from: \(papersPath)")
         do {
-            let files = try fm.contentsOfDirectory(atPath: papersPath)
-            print("Found: \(files)")
+            let dirContents = try fm.contentsOfDirectory(atPath: papersPath)
+            print("Found: \(dirContents)")
                         
-            for file in files {
-                let url = URL(fileURLWithPath: papersPath + file)
+            for filename in dirContents {
+                let url = URL(fileURLWithPath: papersPath + filename)
                 
-                let docType: DocType
+                let docType: FileType
                 
                 if let f = try? url.resourceValues(forKeys: [.isDirectoryKey]) {
                     if f.isDirectory! {
-                        print("Directory: \(file)")
-                        docType = DocType.DIR
-                        //directories.append(file)
+                        docType = FileType.DIR
                     } else {
-                        print("Document: \(file)")
-                        docType = DocType.PDF
+                        docType = FileType.PDF
                     }
-                    
-                    documents.append(Document(url, type: docType, remote: false, title: file, added: Date(), accessed: Date(), tags: [], flagged: false))
+                    self.files.append(File(url, type: docType, name: filename))
                 } else {
-                    print("Problem loading file: \(file)")
+                    print("Problem loading file: \(filename)")
                 }
             }
-                
-                // TODO: we need to get the date the file was created and accessed from the file manager (or remove these variables if we won't be using them)
-                // We also need to load tags and the document state and other such things from somewhere (maybe CoreData? but then we can have a sync problem if the underlying files change)
-            
         } catch {
             print(error)
         }
-        
-        return documents
     }
     
-    public func create() {
-        // This will just add a directory in place which will then be renamed by the user as they'd rename any other folder
+    public func createDirWrapper() { // Using this wrapper for now so we can have optional parameters when creating directories, while still creating them with a Button
+        createDir()
+    }
+    
+    public func createDir(name: String = "New Folder") {
+        var uName = name
+        var collisions = 0
         
+        while self.files.contains(where: {file in file.name == uName}) {
+            uName = name
+            collisions += 1
+            uName = "\(uName)(\(collisions))"
+        }
         
         do {
-            try fm.createDirectory(atPath: papersPath + "New Folder", withIntermediateDirectories: true, attributes: nil)
+            try fm.createDirectory(atPath: papersPath + uName, withIntermediateDirectories: true, attributes: nil)
         } catch {
             print(error)
         }
-        
+    }
+    
+    public func delete(file: File) {
         
     }
     
-    public func getData(document: Document) -> Data? {
+    public func getData(file: File) -> Data? {
         var data: Data?
         
         do {
-            data = try Data(contentsOf: document.id)
+            data = try Data(contentsOf: file.id)
         } catch {
             print(error)
         }
