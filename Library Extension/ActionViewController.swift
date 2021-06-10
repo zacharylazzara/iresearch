@@ -44,17 +44,60 @@ class ActionViewController: UIViewController {
         }
     }
     
-    @IBAction func add() {
+    @IBAction func add() { // We have a lot of duplicate code here shared with the DirectoryView (or its ViewModel); we should try to put this stuff in a single place
         let fm = FileManager.default
-        let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.absoluteURL
         
-        pdfDoc!.write(to: dir.appendingPathComponent(pdfTitle!))
+        let appGroupPath = fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.path
+        let libraryPath = appGroupPath + "/Library/"
+        let papersPath = libraryPath + "Papers/"
         
+        var safeToWrite = false
         
-        // TODO: figure out what to do with the completionRequest if anything (but for now it works fine)
+        if !fm.fileExists(atPath: appGroupPath) && fm.fileExists(atPath: libraryPath) {
+            print("Unable to find AppGroup or Library directories!")
+            // TODO: we need to display an error to the user
+        } else if fm.fileExists(atPath: papersPath) {
+            print("Checking files in: \(papersPath)")
+            do {
+                let files = try fm.contentsOfDirectory(atPath: papersPath)
+                print("Found: \(files)")
+                
+                // TODO: we should ask the user what to do when a conflict is found (for now, just auto-rename)
+                
+                var checkTitle = pdfTitle!
+                var collisions = 0
+                
+                while files.contains(checkTitle) {
+                    checkTitle = pdfTitle!
+                    collisions += 1
+                    checkTitle = "(\(collisions))\(checkTitle)"
+                }
+                
+                pdfTitle = checkTitle
+                safeToWrite = true
+            } catch {
+                print(error)
+            }
+        } else {
+            print("\(papersPath) does not exist! Creating directory...")
+            do {
+                try fm.createDirectory(atPath: papersPath, withIntermediateDirectories: true, attributes: nil)
+                safeToWrite = true
+            } catch {
+                print(error)
+            }
+        }
         
-        // Return any edited content to the host app.
-        // This template doesn't do anything, so we just echo the passed in items.
+        if safeToWrite {
+            pdfDoc!.write(to: URL(fileURLWithPath: papersPath + pdfTitle!))
+            
+            do {
+                print("Found (after writing): \(try fm.contentsOfDirectory(atPath: papersPath))")
+            } catch {
+                print(error)
+            }
+        }
+        
         self.extensionContext!.completeRequest(returningItems: self.extensionContext!.inputItems, completionHandler: nil)
     }
 }

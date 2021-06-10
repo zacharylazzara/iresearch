@@ -10,17 +10,16 @@ import SwiftUI
 struct DirectoryView: View {
     //@ObservedObject var documents: [Document]()
     let fm = FileManager.default
-    @State var items = [String]()
+    //@State var documents = [Document]()
     
     var body: some View {
+        
         Text("Directories").foregroundColor(.gray)
         
         //fm.contentsOfDirectory(atPath: AppGroup.library.containerURL)
         
-        List {
-            ForEach(items, id: \.self) { item in
-                Text(item)
-            }
+        ForEach(load()) { doc in
+            Text(doc.title)
         }
         
         
@@ -30,22 +29,45 @@ struct DirectoryView: View {
         }
     }
     
-    private func create() {
+    // TODO: we should move these functions into a ViewModel!
+    private func load() -> [Document] {
+        var documents = [Document]()
         
-        do {
-            //file:///Users/zachary/Library/Developer/CoreSimulator/Devices/46ACAD62-8A28-46AA-9F3E-F1DDE0A47E3C/data/Containers/Shared/AppGroup/6B55B45C-48D3-457C-B1DA-A2088F35F574//
-            let dir = fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.path// + "/Library"
-            print(dir)
-            items = try fm.contentsOfDirectory(atPath: dir)
-            print(items)
-            
-            for item in items {
-                print("Found \(item)")
+        let appGroupPath = fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.path
+        let libraryPath = appGroupPath + "/Library/"
+        let papersPath = libraryPath + "Papers/"
+        
+        if !fm.fileExists(atPath: appGroupPath) && fm.fileExists(atPath: libraryPath) {
+            print("Unable to find AppGroup or Library directories!")
+            // TODO: we need to display an error to the user
+        } else if fm.fileExists(atPath: papersPath) {
+            print("Loading files from: \(papersPath)")
+            do {
+                let files = try fm.contentsOfDirectory(atPath: papersPath)
+                print("Found: \(files)")
+                            
+                for file in files {
+                    documents.append(Document(URL(string: papersPath + file)!, type: DocType.PDF, remote: false, title: file, added: Date(), accessed: Date(), tags: [], flagged: false))
+                    
+                    // TODO: we need to get the date the file was created and accessed from the file manager (or remove these variables if we won't be using them)
+                    // We also need to load tags and the document state and other such things from somewhere (maybe CoreData? but then we can have a sync problem if the underlying files change)
+                }
+            } catch {
+                print(error)
             }
-        } catch {
-            print(error)
-            // failed to read directory – bad permissions, perhaps?
+        } else {
+            print("\(papersPath) does not exist! Creating directory...")
+            do {
+                try fm.createDirectory(atPath: papersPath, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print(error)
+            }
         }
+        return documents
+    }
+    
+    
+    private func create() {
         // This will just add a directory in place which will then be renamed by the user as they'd rename any other folder
     }
 }

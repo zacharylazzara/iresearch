@@ -7,10 +7,9 @@
 
 import Foundation
 
-struct Document: Identifiable { //, Codable {
-    var id: ObjectIdentifier
+struct Document: Identifiable {
+    let id: URL // The ID will double as the URL to the document
     
-    var URL: URL // Used for both local and remote resources; if we download the document its URL may change to point to the local filesystem.
     let type: DocType
     var remote: Bool // If the file is remote then we allow users to edit the title; if the file is local then edititng the title will edit the file on disk.
     var title: String // Will be the .lastPathComponent of the URL by default, but we may want to allow users to edit this to make documents easier to identify.
@@ -20,6 +19,20 @@ struct Document: Identifiable { //, Codable {
     
     var tags: [String]
     var flagged: Bool
+    
+    init(_ url: URL, type: DocType, remote: Bool, title: String, added: Date, accessed: Date, tags: [String], flagged: Bool) {
+        self.id = url
+        //self.url = url
+        self.type = type
+        self.remote = remote
+        self.title = title
+        self.added = added
+        self.accessed = accessed
+        self.tags = tags
+        self.flagged = flagged
+    }
+    
+    
     
     /* TODO:
     We need to support directories. Ideally we will just create files in local storage and display the directory structure, this way users can access these files from other devices outside of the application via services such as iCloud. When we save the link to a file instead of downloading it, we can provide a spreadsheet or some other such thing in the directory (unless we can somehow link to remote resources within the file system). However, we should also provide the ability to read and work with spreadsheets within the app (in the future), so the implementation may differ.
