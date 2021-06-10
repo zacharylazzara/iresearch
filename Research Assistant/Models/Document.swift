@@ -20,6 +20,8 @@ struct Document: Identifiable {
     var tags: [String]
     var flagged: Bool
     
+    var archived: Bool
+    
     init(_ url: URL, type: DocType, remote: Bool, title: String, added: Date, accessed: Date, tags: [String], flagged: Bool) {
         self.id = url
         //self.url = url
@@ -30,6 +32,7 @@ struct Document: Identifiable {
         self.accessed = accessed
         self.tags = tags
         self.flagged = flagged
+        self.archived = false
     }
     
     
