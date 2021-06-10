@@ -7,6 +7,7 @@
 
 enum DocType {
     case PDF
+    case DIR
     
     /* TODO:
      Add support for other document types such as:

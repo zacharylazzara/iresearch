@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SidebarView: View {
-    @State private var selection: Int? = 1 // TODO: needs to bind? the parent view needs access to these variables I think
+    @State private var selection: Int? = 1
     @State private var title: String = "Home"
     
     var body: some View {
@@ -30,7 +30,7 @@ struct SidebarView: View {
             
             Divider()
             
-            DirectoryView() // TODO: we might need to take the selection from the directory view (or pass the selection into it?)
+            DirectoryView()
         }
         .navigationBarTitle("Library")
         .listStyle(SidebarListStyle())

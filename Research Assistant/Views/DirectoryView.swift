@@ -8,73 +8,26 @@
 import SwiftUI
 
 struct DirectoryView: View {
+    @EnvironmentObject var dirVM: DirectoryViewModel
+    
     var body: some View {
         Text("Directories").foregroundColor(.gray)
         
-        ForEach(load()) { doc in
-            NavigationLink(destination: PDFKitRepresentedView(getData(document: doc)!)) { Text("\(Image(systemName: "doc.text")) \(doc.title)") }
-
+        ForEach(dirVM.load()) { doc in
+            /* TODO:
+             Need to support directories; when we click one we should navigate into it, with a back button to go up a level.
+             We also need to display the root directory (the Papers directory), with child elements offset from it. Whenever we navigate to a new directory, we put it in place of the parent directory and keep elements offset.
+             
+             Directories should be sorted either to the top or bottom of the list, but not alphabetically (as then they get mixed in with documents)
+             */
+            
+            // TODO: we shouldn't use PDFKit if we have a directory, so we'll need to separate these somehow (probably in the ViewModel
+            NavigationLink(destination: PDFKitRepresentedView(dirVM.getData(document: doc)!)) { Text("\(Image(systemName: (doc.type == DocType.DIR ? "folder" : "doc.text"))) \(doc.title)") }
         }
         
-        Button(action: create) {
+        Button(action: dirVM.create) {
             Text("\(Image(systemName: "folder.badge.plus")) Create Directory")
         }
-    }
-    
-    
-    private func getData(document: Document) -> Data? {
-        var data: Data?
-        
-        do {
-            data = try Data(contentsOf: document.id)
-        } catch {
-            print(error)
-        }
-        
-        return data
-    }
-    
-    // TODO: we should move these functions into a ViewModel!
-    private func load() -> [Document] {
-        let fm = FileManager.default
-        var documents = [Document]()
-        
-        let appGroupPath = fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.path
-        let libraryPath = appGroupPath + "/Library/"
-        let papersPath = libraryPath + "Papers/"
-        
-        if !fm.fileExists(atPath: appGroupPath) && fm.fileExists(atPath: libraryPath) {
-            print("Unable to find AppGroup or Library directories!")
-            // TODO: we need to display an error to the user
-        } else if fm.fileExists(atPath: papersPath) {
-            print("Loading files from: \(papersPath)")
-            do {
-                let files = try fm.contentsOfDirectory(atPath: papersPath)
-                print("Found: \(files)")
-                            
-                for file in files {
-                    documents.append(Document(URL(string: "file://" + papersPath + file)!, type: DocType.PDF, remote: false, title: file, added: Date(), accessed: Date(), tags: [], flagged: false))
-                    
-                    // TODO: we need to get the date the file was created and accessed from the file manager (or remove these variables if we won't be using them)
-                    // We also need to load tags and the document state and other such things from somewhere (maybe CoreData? but then we can have a sync problem if the underlying files change)
-                }
-            } catch {
-                print(error)
-            }
-        } else {
-            print("\(papersPath) does not exist! Creating directory...")
-            do {
-                try fm.createDirectory(atPath: papersPath, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                print(error)
-            }
-        }
-        return documents
-    }
-    
-    
-    private func create() {
-        // This will just add a directory in place which will then be renamed by the user as they'd rename any other folder
     }
 }
 

@@ -10,11 +10,14 @@ import SwiftUI
 @main
 struct Research_AssistantApp: App {
     let persistenceController = PersistenceController.shared
+    let directoryViewModel = DirectoryViewModel()
+    
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(directoryViewModel)
         }
     }
 }
