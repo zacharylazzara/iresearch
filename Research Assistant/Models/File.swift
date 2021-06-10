@@ -7,7 +7,15 @@
 
 import Foundation
 
-struct File: Identifiable {
+struct File: Identifiable, Comparable {
+    static func < (lhs: File, rhs: File) -> Bool {
+        if lhs.type != rhs.type {
+            return lhs.type < rhs.type
+        } else {
+            return lhs.name < rhs.name
+        }
+    }
+    
     let id: URL // The ID will double as the URL to the document
     
     // TODO: need to support moving documents to new directories

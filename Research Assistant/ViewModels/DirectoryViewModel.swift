@@ -45,6 +45,7 @@ class DirectoryViewModel: ObservableObject {
     }
     
     private func load() {
+        self.files.removeAll()
         print("Loading files from: \(papersPath)")
         do {
             let dirContents = try fm.contentsOfDirectory(atPath: papersPath)
@@ -66,6 +67,7 @@ class DirectoryViewModel: ObservableObject {
                     print("Problem loading file: \(filename)")
                 }
             }
+            files.sort()
         } catch {
             print(error)
         }
@@ -87,6 +89,7 @@ class DirectoryViewModel: ObservableObject {
         
         do {
             try fm.createDirectory(atPath: papersPath + uName, withIntermediateDirectories: true, attributes: nil)
+            load()
         } catch {
             print(error)
         }
