@@ -7,7 +7,7 @@
 
 enum FileType: Comparable {
     case PDF
-    case DIR
+    case DIR // DIR should always be the last element, so that directories will be shown after everything
     
     /* TODO:
      Add support for other document types such as:
