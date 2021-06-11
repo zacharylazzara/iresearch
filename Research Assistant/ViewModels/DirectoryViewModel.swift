@@ -118,6 +118,10 @@ class DirectoryViewModel: ObservableObject {
         
     }
     
+    public func pDir() {
+        directory = directory.parent ?? directory
+    }
+    
     public func cDir(dir: String) {
         directory = (directory.children!.first(where: { child in child.name == dir }))!
     }

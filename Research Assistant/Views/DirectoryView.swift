@@ -11,9 +11,7 @@ struct DirectoryView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
     
     var body: some View {
-        //Text("Directories").foregroundColor(.gray) // We could change the name to match the directory we're in; when we're not in the root directory add a back button?
-        
-        Button(action: {  } ) {
+        Button(action: { dirVM.pDir() } ) {
             Text("\(dirVM.directory.isRoot() ? Image(systemName: "folder.circle") : Image(systemName: "chevron.left")) \(dirVM.directory.name)")
                 .foregroundColor(dirVM.directory.isRoot() ? .secondary : .primary)
         }.disabled(dirVM.directory.isRoot())
