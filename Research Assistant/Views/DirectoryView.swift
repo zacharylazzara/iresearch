@@ -11,25 +11,33 @@ struct DirectoryView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
     
     var body: some View {
-        Button(action: { dirVM.changeDir(file: dirVM.directory.parent!) } ) {
+        Button(action: { dirVM.changeDir(dir: dirVM.directory.parent!) } ) {
             Text("\(dirVM.directory.isRoot() ? Image(systemName: "folder.circle") : Image(systemName: "chevron.left")) \(dirVM.directory.name)")
                 .foregroundColor(dirVM.directory.isRoot() ? .secondary : .primary)
         }.disabled(dirVM.directory.isRoot())
         
         ForEach(dirVM.loadDir()) { file in
             if !file.isHidden() || dirVM.showHidden {
-                if file.isDir() {
-                    Button(action: { dirVM.changeDir(file: file) }) {
+                if let dir = file as? Directory {
+                    Button(action: { dirVM.changeDir(dir: dir) }) {
                         Text("\(Image(systemName: "folder")) \(file.name)")
                     }
                 } else {
-                    NavigationLink(destination: (file.isDir() ? nil : PDFKitRepresentedView(dirVM.loadData(file: file)))) { Text("\(Image(systemName: (file.isDir() ? "folder" : "doc.text"))) \(file.name)") }
+                    NavigationLink(destination: (PDFKitRepresentedView(dirVM.loadData(doc: file as! Document)))) { Text("\(Image(systemName: ("doc.text"))) \(file.name)") }
                 }
             }
-        }
+        }.onDelete(perform: delete)
         
         Button(action: { dirVM.createDir() }) {
             Text("\(Image(systemName: "folder.badge.plus")) Create Directory")
+        }
+    }
+    
+    func delete(offsets: IndexSet) {
+        offsets.forEach { offset in
+            let file = dirVM.loadDir()[offset]
+            print("Deleting \(((file as? Directory) != nil) ? "directory" : "document"): \(file.name)")
+            //dirVM.delete(offsets: offsets)
         }
     }
 }

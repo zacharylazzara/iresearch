@@ -17,7 +17,7 @@ class DirectoryViewModel: ObservableObject {
     private let fm: FileManager
     private let rootURL: URL
     
-    @Published public var directory: File
+    @Published public var directory: Directory
     @Published public var showHidden: Bool
     
     init() {
@@ -37,8 +37,8 @@ class DirectoryViewModel: ObservableObject {
             }
         }
         
-        self.directory = File(url: self.rootURL, name: self.rootURL.lastPathComponent)
-        try? self.directory.append(files: load(file: self.directory) as? [File], overwrite: true)
+        self.directory = Directory(url: self.rootURL, name: self.rootURL.lastPathComponent)
+        self.directory.children = load(file: self.directory)
     }
     
     // TODO: we can use .DS_Store to store our custom attributes such as which files are flagged etc
@@ -46,27 +46,31 @@ class DirectoryViewModel: ObservableObject {
     // TODO: Also look into outline groups (this is what we'd use for iOS I think) https://developer.apple.com/documentation/swiftui/outlinegroup
     // TODO: we need to auto-update the view when the directory's children change (currently view only updates when the directory changes, but not when it gets new folders)
     
-    public func loadData(file: File) -> Data {
-        return load(file: file) as! Data
+    public func changeDir(dir: Directory) { // TODO: maybe check to make sure we don't try to change to a data file vs a directory?
+        self.directory = dir
+    }
+    
+    public func loadData(doc: Document) -> Data {
+        return try! doc.read()
     }
     
     public func loadDir() -> [File] {
-        return try! self.directory.read() as! [File]
+        return self.directory.children!
     }
     
-    private func load(file: File) -> Any? {
+    private func load(file: File) -> [File]? {
         print("Loading from file: \(file.name)")
         
-        var children: [File]?
         
-        if file.isDir() {
+        
+        if let dir = file as? Directory {
             print("File is a directory")
             
-            children = [File]()
+            var children = [File]()
             let fileChildren: [URL]
             
             do {
-                fileChildren = try fm.contentsOfDirectory(at: file.url, includingPropertiesForKeys: nil) // TODO: look into includingPropertiesForKeys, maybe we can get dates and such with it?
+                fileChildren = try fm.contentsOfDirectory(at: dir.url, includingPropertiesForKeys: nil) // TODO: look into includingPropertiesForKeys, maybe we can get dates and such with it?
             } catch {
                 print(error)
                 return nil
@@ -75,25 +79,25 @@ class DirectoryViewModel: ObservableObject {
             print("Found: \(fileChildren)")
             
             for url in fileChildren {
-                let child = File(url: url, name: url.lastPathComponent, parent: file)
+                let child: File
                 
-                do {
-                    if child.isDir() {
-                        try child.append(files: load(file: child) as? [File], overwrite: true)
-                    }
-                } catch {
-                    print(error)
-                    return nil
+                if (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory)! {
+                    child = Directory(url: url, name: url.lastPathComponent, parent: dir)
+                } else {
+                    child = Document(url: url, name: url.lastPathComponent, parent: dir)
                 }
                 
-                children?.append(child)
-                children?.sort()
+                if let childDir = child as? Directory {
+                    childDir.children = load(file: childDir)
+                }
+                
+                children.append(child)
+                //children?.sort()
             }
             
             return children
         } else {
-            print("File is a document")
-            return try! file.read() as! Data
+            return nil
         }
     }
     
@@ -101,17 +105,17 @@ class DirectoryViewModel: ObservableObject {
         var uName = name
         var collisions = 0
         
-        while (try? self.directory.read() as! [File]?)!.contains(where: {file in file.name == uName}) {
+        while self.directory.children!.contains(where: {file in file.name == uName}) {
             uName = name
             collisions += 1
             uName = "\(uName)(\(collisions))"
         }
         
         do {
-            let newDir = File(url: self.directory.url.appendingPathComponent(uName), name: uName, parent: self.directory)
+            let newDir = Directory(url: self.directory.url.appendingPathComponent(uName), name: uName, parent: self.directory)
             try fm.createDirectory(at: newDir.url, withIntermediateDirectories: false, attributes: nil)
-            try? newDir.append(files: load(file: newDir) as? [File], overwrite: true)
-            try? self.directory.append(files: [newDir])
+            newDir.children = load(file: newDir)
+            self.directory.children?.append(newDir)
             
             // TODO: we need to refresh the view somehow! Ideally it would be done as a result of data changing, but if that's not feasible we can just do it here somehow
         } catch {
@@ -119,11 +123,15 @@ class DirectoryViewModel: ObservableObject {
         }
     }
     
-    public func delete(file: File) {
+    public func delete(offsets: IndexSet, file: File) {
         
-    }
-    
-    public func changeDir(file: File) { // TODO: maybe check to make sure we don't try to change to a data file vs a directory?
-        self.directory = file
+        
+        
+        //try! self.directory.remove(offsets: offsets)
+        
+        
+        //try! fm.trashItem(at: file.url, resultingItemURL: nil) // TODO: we can get the URL of the file in the trash if we want to let users restore it (add this in later)
+        
+        
     }
 }

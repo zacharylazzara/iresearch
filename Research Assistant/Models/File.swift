@@ -40,81 +40,45 @@ import Foundation
 
 
 
-
-class File: Identifiable, Comparable, CustomStringConvertible, ObservableObject {
-    static func == (lhs: File, rhs: File) -> Bool {
-        if lhs.isDir() == rhs.isDir() {
-            return lhs.isDir() == rhs.isDir()
-        } else {
-            return lhs.name == rhs.name
-        }
-    }
-    
-    static func < (lhs: File, rhs: File) -> Bool {
-        if lhs.isDir() != rhs.isDir() {
-            return !lhs.isDir()
-        } else {
-            return lhs.name < rhs.name
-        }
-    }
+// TODO: it would probably make more sense to use inheritance instead of the way I'm doing this currently. Should have three classes: file, document, directory. (document and directory inherit from file)
+class File: Identifiable, CustomStringConvertible, ObservableObject {//, Comparable {
+//    static func == (lhs: File, rhs: File) -> Bool {
+//        if lhs.isDir() == rhs.isDir() {
+//            return lhs.isDir() == rhs.isDir()
+//        } else {
+//            return lhs.name == rhs.name
+//        }
+//    }
+//
+//    static func < (lhs: File, rhs: File) -> Bool {
+//        if lhs.isDir() != rhs.isDir() {
+//            return !lhs.isDir()
+//        } else {
+//            return lhs.name < rhs.name
+//        }
+//    }
     
     var id: URL { url }
     let url: URL
-    
-    // TODO: need to support moving documents to new directories
-    let parent: File?
-    @Published private var children: [File]?
-    
-    func append(files: [File]?, overwrite: Bool = false) throws {
-        if isDir() {
-            objectWillChange.send()
-            
-            if overwrite {
-                children = files
-            } else {
-                files?.forEach { file in
-                    children!.append(file)
-                }
-            }
-        } else {
-            throw ErrorType.NOT_DIR
-        }
-    }
-    
-    func read() throws -> Any? {
-        if isDir() {
-            return children
-        } else {
-            return try Data(contentsOf: url)
-        }
-    }
-    
-    
-    
-    
-    var remote: Bool // If the file is remote then we allow users to edit the title; if the file is local then edititng the title will edit the file on disk.
-    var name: String // Will be the .lastPathComponent of the URL by default, but we may want to allow users to edit this to make documents easier to identify.
+    let parent: Directory?
+    var name: String
     
     let added: Date?
     var accessed: Date? // When the user last read the file
-    
     var tags: [String]
     var flagged: Bool
-    
     var archived: Bool
     
-    init(url: URL, name: String, parent: File? = nil, children: [File]? = nil) {
+    init(url: URL, name: String, parent: Directory? = nil) {
         self.url = url
         self.name = name
         self.parent = parent
-        self.children = children
         
         // TODO: figure out what to do with these later
         self.added = nil
         self.accessed = nil
         self.tags = []
         self.flagged = false
-        self.remote = false
         self.archived = false
     }
     
@@ -125,14 +89,6 @@ class File: Identifiable, Comparable, CustomStringConvertible, ObservableObject 
         case .some(let parent):
             return "Parent: \(parent.name) File: \(name)"
         }
-    }
-    
-    func isRoot() -> Bool {
-        return parent == nil
-    }
-    
-    func isDir() -> Bool {
-        return (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory)!
     }
     
     func isHidden() -> Bool {
