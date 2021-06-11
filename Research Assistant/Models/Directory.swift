@@ -7,7 +7,15 @@
 
 import Foundation
 
-class Directory: File {
+class Directory: File, ObservableObject {
+    static func == (lhs: Directory, rhs: Directory) -> Bool {
+        return lhs.name == rhs.name
+    }
+
+    static func < (lhs: Directory, rhs: Directory) -> Bool {
+        return lhs.name < rhs.name
+    }
+    
     @Published public var children: [File]?
     
     func isRoot() -> Bool {

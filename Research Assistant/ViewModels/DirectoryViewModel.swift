@@ -84,51 +84,10 @@ class DirectoryViewModel: ObservableObject {
             }
             
             children.append(child)
-            //children?.sort()
+            children.sort(by: >)
         }
         
         return children
-        
-        
-        
-        
-//        if let dir = file as? Directory {
-//            print("File is a directory")
-//
-//            var children = [File]()
-//            let fileChildren: [URL]
-//
-//            do {
-//                fileChildren = try fm.contentsOfDirectory(at: dir.url, includingPropertiesForKeys: nil) // TODO: look into includingPropertiesForKeys, maybe we can get dates and such with it?
-//            } catch {
-//                print(error)
-//                return nil
-//            }
-//
-//            print("Found: \(fileChildren)")
-//
-//            for url in fileChildren {
-//                let child: File
-//
-//                if (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory)! {
-//                    child = Directory(url: url, name: url.lastPathComponent, parent: dir)
-//                    (child as! Directory).children = load(file: child as! Directory)
-//                } else {
-//                    child = Document(url: url, name: url.lastPathComponent, parent: dir)
-//                }
-//
-////                if let childDir = child as? Directory {
-////                    childDir.children = load(file: childDir)
-////                }
-//
-//                children.append(child)
-//                //children?.sort()
-//            }
-//
-//            return children
-//        } else {
-//            return nil
-//        }
     }
     
     public func createDir(name: String = "New Folder") {

@@ -28,6 +28,8 @@ struct DirectoryView: View {
             }
         }.onDelete(perform: delete)
         
+        Divider()
+        
         Button(action: { dirVM.createDir() }) {
             Text("\(Image(systemName: "folder.badge.plus")) Create Directory")
         }

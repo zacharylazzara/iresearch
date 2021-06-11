@@ -8,6 +8,14 @@
 import Foundation
 
 class Document: File {
+    static func == (lhs: Document, rhs: Document) -> Bool {
+        return lhs.name == rhs.name
+    }
+
+    static func < (lhs: Document, rhs: Document) -> Bool {
+        return lhs.name < rhs.name
+    }
+    
     func read() throws -> Data {
         return try Data(contentsOf: url)
     }

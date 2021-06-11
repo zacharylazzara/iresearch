@@ -41,22 +41,14 @@ import Foundation
 
 
 // TODO: it would probably make more sense to use inheritance instead of the way I'm doing this currently. Should have three classes: file, document, directory. (document and directory inherit from file)
-class File: Identifiable, CustomStringConvertible, ObservableObject {//, Comparable {
-//    static func == (lhs: File, rhs: File) -> Bool {
-//        if lhs.isDir() == rhs.isDir() {
-//            return lhs.isDir() == rhs.isDir()
-//        } else {
-//            return lhs.name == rhs.name
-//        }
-//    }
-//
-//    static func < (lhs: File, rhs: File) -> Bool {
-//        if lhs.isDir() != rhs.isDir() {
-//            return !lhs.isDir()
-//        } else {
-//            return lhs.name < rhs.name
-//        }
-//    }
+class File: Identifiable, CustomStringConvertible, Comparable {
+    static func == (lhs: File, rhs: File) -> Bool {
+        return lhs.name == rhs.name
+    }
+
+    static func < (lhs: File, rhs: File) -> Bool {
+        return lhs.name < rhs.name
+    }
     
     var id: URL { url }
     let url: URL
