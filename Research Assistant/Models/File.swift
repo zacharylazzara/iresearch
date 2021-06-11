@@ -41,20 +41,32 @@ import Foundation
 
 
 
-struct File: Identifiable, Comparable {
+class File: Identifiable, Comparable, CustomStringConvertible {
+    static func == (lhs: File, rhs: File) -> Bool {
+        if lhs.url.hasDirectoryPath == rhs.url.hasDirectoryPath {
+            return lhs.url.hasDirectoryPath == rhs.url.hasDirectoryPath
+        } else {
+            return lhs.name == rhs.name
+        }
+    }
+    
     static func < (lhs: File, rhs: File) -> Bool {
-        if lhs.type != rhs.type {
-            return lhs.type < rhs.type
+        if lhs.url.hasDirectoryPath != rhs.url.hasDirectoryPath {
+            return lhs.url.hasDirectoryPath != rhs.url.hasDirectoryPath
         } else {
             return lhs.name < rhs.name
         }
     }
     
-    let id: URL // The ID will double as the URL to the document
+    var id: Self { self } // The ID will double as the URL to the document
+    let url: URL
     
     // TODO: need to support moving documents to new directories
+    let parent: File?
+    var children: [File]?
     
-    let type: FileType
+    
+    
     var remote: Bool // If the file is remote then we allow users to edit the title; if the file is local then edititng the title will edit the file on disk.
     var name: String // Will be the .lastPathComponent of the URL by default, but we may want to allow users to edit this to make documents easier to identify.
     
@@ -66,10 +78,11 @@ struct File: Identifiable, Comparable {
     
     var archived: Bool
     
-    init(_ url: URL, type: FileType, name: String) {
-        self.id = url
-        self.type = type
+    init(url: URL, name: String, parent: File? = nil, children: [File]? = nil) {
+        self.url = url
         self.name = name
+        self.parent = parent
+        self.children = children
         
         // TODO: figure out what to do with these later
         self.added = nil
@@ -80,7 +93,22 @@ struct File: Identifiable, Comparable {
         self.archived = false
     }
     
+    var description: String {
+        switch parent {
+        case nil:
+            return "ROOT: \(name)"
+        case .some(let parent):
+            return "Parent: \(parent.name) File: \(name)"
+        }
+    }
     
+    func isRoot() -> Bool {
+        return parent == nil
+    }
+    
+    func isDir() -> Bool {
+        return url.hasDirectoryPath
+    }
     
     /* TODO:
     We need to support directories. Ideally we will just create files in local storage and display the directory structure, this way users can access these files from other devices outside of the application via services such as iCloud. When we save the link to a file instead of downloading it, we can provide a spreadsheet or some other such thing in the directory (unless we can somehow link to remote resources within the file system). However, we should also provide the ability to read and work with spreadsheets within the app (in the future), so the implementation may differ.

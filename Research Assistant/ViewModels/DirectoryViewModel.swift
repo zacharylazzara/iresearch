@@ -14,94 +14,82 @@ import Foundation
 
 class DirectoryViewModel: ObservableObject {
     private let fm: FileManager
-    private let appGroupPath: String
-    private let libraryPath: String
-    private let rootPath: String
-    private var currentPath: String
+    private let rootURL: URL
     
-    @Published public var files: [File]
-    @Published public var currentDir: String?
-    @Published public var rootDir: Bool
+    @Published public var directory: File
+    
     
     init() {
         self.fm = FileManager.default
-        self.appGroupPath = self.fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.path + "/"
-        self.libraryPath = self.appGroupPath + "Library/"
-        self.rootPath = self.libraryPath + "Papers/"
-        self.files = [File]()
-        rootDir = true
+        self.rootURL = AppGroup.library.containerURL.appendingPathComponent("Library", isDirectory: true).appendingPathComponent("Papers", isDirectory: true)
         
-        self.currentPath = self.rootPath
+        print("Root URL: \(rootURL)")
         
-        if !self.fm.fileExists(atPath: self.appGroupPath) && self.fm.fileExists(atPath: self.libraryPath) {
-            print("Unable to find AppGroup or Library directories!")
-            
-            // TODO: we need to display an error to the user (maybe throw an exception?
-            
-        } else if !self.fm.fileExists(atPath: self.rootPath) {
-            print("\(self.rootPath) does not exist! Creating directory...")
+        if !fm.fileExists(atPath: rootURL.path) {
             do {
-                try self.fm.createDirectory(atPath: self.rootPath, withIntermediateDirectories: true, attributes: nil)
+                print("\(rootURL.lastPathComponent) doesn't exist! Creating directory...")
+                try fm.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
+                print("Successfully created \(rootURL.lastPathComponent)!")
             } catch {
                 print(error)
             }
-        } else {
-            load(path: rootPath) // TODO: we may need to figure out a way to make files observe this? right now it'll only run once and won't update data when data is added
         }
+        
+        directory = File(url: self.rootURL, name: self.rootURL.lastPathComponent)
+        directory.children = loadDir(file: directory)
     }
     
-    
+    // TODO: we can use .DS_Store to store our custom attributes such as which files are flagged etc
     // TODO: look into  https://developer.apple.com/documentation/appkit/nsoutlineview
     // TODO: Also look into outline groups (this is what we'd use for iOS I think) https://developer.apple.com/documentation/swiftui/outlinegroup
     
+    public func loadData(file: File) -> Data {
+        return load(file: file)!.1!
+    }
     
-    // TODO: load should iterate recursively; we want to make a doubly linked list for our files
-//    var root: File
-//
-//    private func load(file: File) throws {
-//        fm.changeCurrentDirectoryPath(file.description)
-//        root.children = try fm.contentsOfDirectory(atPath: fm.currentDirectoryPath)
-//
-//
-//
-//    }
-//
+    public func loadDir(file: File) -> [File] {
+        return load(file: file)!.0!
+    }
     
-    private func load(path: String) {
-        currentPath = path
-        currentDir = URL(fileURLWithPath: currentPath).lastPathComponent
+    private func load(file: File) -> ([File]?, Data?)? {
+        print("Loading from file: \(file.name)")
         
-        if currentPath == rootPath {
-            rootDir = true
-        } else {
-            rootDir = false
-        }
+        var children: [File]?
         
-        self.files.removeAll()
-        print("Loading files from: \(path)")
-        do {
-            let dirContents = try fm.contentsOfDirectory(atPath: path)
-            print("Found: \(dirContents)")
-                        
-            for filename in dirContents {
-                let url = URL(fileURLWithPath: path + filename)
-                
-                let docType: FileType
-                
-                if let f = try? url.resourceValues(forKeys: [.isDirectoryKey]) {
-                    if f.isDirectory! {
-                        docType = FileType.DIR
-                    } else {
-                        docType = FileType.PDF
-                    }
-                    self.files.append(File(url, type: docType, name: filename))
-                } else {
-                    print("Problem loading file: \(filename)")
-                }
+        if file.isDir() {
+            print("File is a directory")
+            
+            children = [File]()
+            let fileChildren: [URL]
+            
+            do {
+                fileChildren = try fm.contentsOfDirectory(at: file.url, includingPropertiesForKeys: nil) // TODO: look into includingPropertiesForKeys, maybe we can get dates and such with it?
+            } catch {
+                print(error)
+                return nil
             }
-            files.sort()
-        } catch {
-            print(error)
+            
+            print("Found: \(fileChildren)")
+            
+            for url in fileChildren {
+                let child = File(url: url, name: url.lastPathComponent, parent: file)
+                
+                if child.isDir() {
+                    child.children = load(file: child)?.0
+                }
+                
+                children?.append(child)
+            }
+            
+            return (children, nil)
+        } else {
+            print("File is a document")
+            
+            guard let data = try? Data(contentsOf: file.url) else {
+                return nil
+            }
+            
+            return (nil, data)
         }
     }
     
@@ -109,15 +97,18 @@ class DirectoryViewModel: ObservableObject {
         var uName = name
         var collisions = 0
         
-        while self.files.contains(where: {file in file.name == uName}) {
+        while self.directory.children!.contains(where: {file in file.name == uName}) {
             uName = name
             collisions += 1
             uName = "\(uName)(\(collisions))"
         }
         
         do {
-            try fm.createDirectory(atPath: currentPath + uName, withIntermediateDirectories: true, attributes: nil)
-            load(path: currentPath)
+            let newDir = File(url: directory.url.appendingPathComponent(uName), name: uName)
+            try fm.createDirectory(at: newDir.url, withIntermediateDirectories: false, attributes: nil)
+            directory.children!.append(newDir)
+            
+            // TODO: we need to refresh the view somehow
         } catch {
             print(error)
         }
@@ -128,20 +119,6 @@ class DirectoryViewModel: ObservableObject {
     }
     
     public func cDir(dir: String) {
-        load(path: currentPath + dir)
-    }
-    
-    
-    
-    public func getData(file: File) -> Data? {
-        var data: Data?
-        
-        do {
-            data = try Data(contentsOf: file.id)
-        } catch {
-            print(error)
-        }
-        
-        return data
+        directory = (directory.children!.first(where: { child in child.name == dir }))!
     }
 }
