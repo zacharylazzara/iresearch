@@ -123,11 +123,7 @@ class DirectoryViewModel: ObservableObject {
         
     }
     
-    public func pDir() {
-        self.directory = self.directory.parent ?? self.directory
-    }
-    
-    public func cDir(dir: String) {
-        self.directory = ((try? self.directory.read() as! [File]?)!.first(where: { child in child.name == dir }))!
+    public func changeDir(file: File) { // TODO: maybe check to make sure we don't try to change to a data file vs a directory?
+        self.directory = file
     }
 }
