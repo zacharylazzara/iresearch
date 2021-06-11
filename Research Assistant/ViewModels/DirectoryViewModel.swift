@@ -20,7 +20,6 @@ class DirectoryViewModel: ObservableObject {
     @Published public var directory: File
     @Published public var showHidden: Bool
     
-    
     init() {
         self.fm = FileManager.default
         self.rootURL = AppGroup.library.containerURL.appendingPathComponent("Library", isDirectory: true).appendingPathComponent("Papers", isDirectory: true)
@@ -45,6 +44,7 @@ class DirectoryViewModel: ObservableObject {
     // TODO: we can use .DS_Store to store our custom attributes such as which files are flagged etc
     // TODO: look into  https://developer.apple.com/documentation/appkit/nsoutlineview
     // TODO: Also look into outline groups (this is what we'd use for iOS I think) https://developer.apple.com/documentation/swiftui/outlinegroup
+    // TODO: we need to auto-update the view when the directory's children change (currently view only updates when the directory changes, but not when it gets new folders)
     
     public func loadData(file: File) -> Data {
         return load(file: file)!.1!
@@ -113,7 +113,7 @@ class DirectoryViewModel: ObservableObject {
             newDir.children = loadDir(file: newDir)
             self.directory.children!.append(newDir)
             
-            // TODO: we need to refresh the view somehow
+            // TODO: we need to refresh the view somehow! Ideally it would be done as a result of data changing, but if that's not feasible we can just do it here somehow
         } catch {
             print(error)
         }

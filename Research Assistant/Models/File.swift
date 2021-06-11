@@ -58,7 +58,7 @@ class File: Identifiable, Comparable, CustomStringConvertible {
         }
     }
     
-    var id: Self { self } // The ID will double as the URL to the document
+    var id: URL { url } // The ID will double as the URL to the document
     let url: URL
     
     // TODO: need to support moving documents to new directories
