@@ -105,8 +105,7 @@ class DirectoryViewModel: ObservableObject {
             try fm.createDirectory(at: newDir.url, withIntermediateDirectories: false, attributes: nil)
             newDir.children = load(dir: newDir)
             self.directory.children?.append(newDir)
-            
-            // TODO: we need to refresh the view somehow! Ideally it would be done as a result of data changing, but if that's not feasible we can just do it here somehow
+            objectWillChange.send()
         } catch {
             print(error)
         }
