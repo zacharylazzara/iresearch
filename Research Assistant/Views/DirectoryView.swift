@@ -16,7 +16,7 @@ struct DirectoryView: View {
                 .foregroundColor(dirVM.directory.isRoot() ? .secondary : .primary)
         }.disabled(dirVM.directory.isRoot())
         
-        ForEach(dirVM.directory.children!) { file in
+        ForEach(dirVM.loadDir()) { file in
             if !file.isHidden() || dirVM.showHidden {
                 if file.isDir() {
                     Button(action: { dirVM.cDir(dir: file.name) }) {

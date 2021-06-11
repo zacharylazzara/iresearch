@@ -41,7 +41,7 @@ import Foundation
 
 
 
-class File: Identifiable, Comparable, CustomStringConvertible {
+class File: Identifiable, Comparable, CustomStringConvertible, ObservableObject {
     static func == (lhs: File, rhs: File) -> Bool {
         if lhs.isDir() == rhs.isDir() {
             return lhs.isDir() == rhs.isDir()
@@ -58,12 +58,37 @@ class File: Identifiable, Comparable, CustomStringConvertible {
         }
     }
     
-    var id: URL { url } // The ID will double as the URL to the document
+    var id: URL { url }
     let url: URL
     
     // TODO: need to support moving documents to new directories
     let parent: File?
-    var children: [File]?
+    @Published private var children: [File]?
+    
+    func append(files: [File]?, overwrite: Bool = false) throws {
+        if isDir() {
+            objectWillChange.send()
+            
+            if overwrite {
+                children = files
+            } else {
+                files?.forEach { file in
+                    children!.append(file)
+                }
+            }
+        } else {
+            throw ErrorType.NOT_DIR
+        }
+    }
+    
+    func read() throws -> Any? {
+        if isDir() {
+            return children
+        } else {
+            return try Data(contentsOf: url)
+        }
+    }
+    
     
     
     

@@ -38,7 +38,7 @@ class DirectoryViewModel: ObservableObject {
         }
         
         self.directory = File(url: self.rootURL, name: self.rootURL.lastPathComponent)
-        self.directory.children = loadDir(file: self.directory)
+        try? self.directory.append(files: load(file: self.directory) as? [File], overwrite: true)
     }
     
     // TODO: we can use .DS_Store to store our custom attributes such as which files are flagged etc
@@ -47,14 +47,14 @@ class DirectoryViewModel: ObservableObject {
     // TODO: we need to auto-update the view when the directory's children change (currently view only updates when the directory changes, but not when it gets new folders)
     
     public func loadData(file: File) -> Data {
-        return load(file: file)!.1!
+        return load(file: file) as! Data
     }
     
-    public func loadDir(file: File) -> [File] {
-        return load(file: file)!.0!
+    public func loadDir() -> [File] {
+        return try! self.directory.read() as! [File]
     }
     
-    private func load(file: File) -> ([File]?, Data?)? {
+    private func load(file: File) -> Any? {
         print("Loading from file: \(file.name)")
         
         var children: [File]?
@@ -77,23 +77,23 @@ class DirectoryViewModel: ObservableObject {
             for url in fileChildren {
                 let child = File(url: url, name: url.lastPathComponent, parent: file)
                 
-                if child.isDir() {
-                    child.children = load(file: child)?.0
+                do {
+                    if child.isDir() {
+                        try child.append(files: load(file: child) as? [File], overwrite: true)
+                    }
+                } catch {
+                    print(error)
+                    return nil
                 }
                 
                 children?.append(child)
                 children?.sort()
             }
             
-            return (children, nil)
+            return children
         } else {
             print("File is a document")
-            
-            guard let data = try? Data(contentsOf: file.url) else {
-                return nil
-            }
-            
-            return (nil, data)
+            return try! file.read() as! Data
         }
     }
     
@@ -101,7 +101,7 @@ class DirectoryViewModel: ObservableObject {
         var uName = name
         var collisions = 0
         
-        while self.directory.children!.contains(where: {file in file.name == uName}) {
+        while (try? self.directory.read() as! [File]?)!.contains(where: {file in file.name == uName}) {
             uName = name
             collisions += 1
             uName = "\(uName)(\(collisions))"
@@ -110,8 +110,8 @@ class DirectoryViewModel: ObservableObject {
         do {
             let newDir = File(url: self.directory.url.appendingPathComponent(uName), name: uName, parent: self.directory)
             try fm.createDirectory(at: newDir.url, withIntermediateDirectories: false, attributes: nil)
-            newDir.children = loadDir(file: newDir)
-            self.directory.children!.append(newDir)
+            try? newDir.append(files: load(file: newDir) as? [File], overwrite: true)
+            try? self.directory.append(files: [newDir])
             
             // TODO: we need to refresh the view somehow! Ideally it would be done as a result of data changing, but if that's not feasible we can just do it here somehow
         } catch {
@@ -128,6 +128,6 @@ class DirectoryViewModel: ObservableObject {
     }
     
     public func cDir(dir: String) {
-        self.directory = (self.directory.children!.first(where: { child in child.name == dir }))!
+        self.directory = ((try? self.directory.read() as! [File]?)!.first(where: { child in child.name == dir }))!
     }
 }
