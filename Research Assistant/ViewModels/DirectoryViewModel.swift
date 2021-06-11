@@ -111,15 +111,13 @@ class DirectoryViewModel: ObservableObject {
         }
     }
     
-    public func delete(offsets: IndexSet, file: File) {
-        
-        
-        
-        //try! self.directory.remove(offsets: offsets)
-        
-        
-        //try! fm.trashItem(at: file.url, resultingItemURL: nil) // TODO: we can get the URL of the file in the trash if we want to let users restore it (add this in later)
-        
-        
+    public func delete(offsets: IndexSet) {
+        offsets.forEach { offset in
+            //try! self.fm.trashItem(at: (self.directory.children?[offset].url)!, resultingItemURL: nil) // TODO: get url from trash later so we can potentially restore if needed (also need to implement a way to empty the trash?)
+            
+            try! self.fm.removeItem(at: self.directory.children![offset].url)
+        }
+        self.directory.children?.remove(atOffsets: offsets)
+        objectWillChange.send()
     }
 }

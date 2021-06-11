@@ -39,7 +39,7 @@ struct DirectoryView: View {
         offsets.forEach { offset in
             let file = dirVM.loadDir()[offset]
             print("Deleting \(((file as? Directory) != nil) ? "directory" : "document"): \(file.name)")
-            //dirVM.delete(offsets: offsets)
+            dirVM.delete(offsets: offsets)
         }
     }
 }
