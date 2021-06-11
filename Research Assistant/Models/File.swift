@@ -43,16 +43,16 @@ import Foundation
 
 class File: Identifiable, Comparable, CustomStringConvertible {
     static func == (lhs: File, rhs: File) -> Bool {
-        if lhs.url.hasDirectoryPath == rhs.url.hasDirectoryPath {
-            return lhs.url.hasDirectoryPath == rhs.url.hasDirectoryPath
+        if lhs.isDir() == rhs.isDir() {
+            return lhs.isDir() == rhs.isDir()
         } else {
             return lhs.name == rhs.name
         }
     }
     
     static func < (lhs: File, rhs: File) -> Bool {
-        if lhs.url.hasDirectoryPath != rhs.url.hasDirectoryPath {
-            return lhs.url.hasDirectoryPath != rhs.url.hasDirectoryPath
+        if lhs.isDir() != rhs.isDir() {
+            return !lhs.isDir()
         } else {
             return lhs.name < rhs.name
         }

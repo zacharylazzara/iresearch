@@ -10,6 +10,7 @@ import Foundation
 /* TODO:
  - Load PDFs from local storage
  - Load PDFs from web (HTTPS; may need to give an option to allow HTTP as well)
+ - Need to make sure we're doing file navigation properly; want to avoid duplicating things in memory
  */
 
 class DirectoryViewModel: ObservableObject {
@@ -79,6 +80,7 @@ class DirectoryViewModel: ObservableObject {
                 }
                 
                 children?.append(child)
+                children?.sort()
             }
             
             return (children, nil)
