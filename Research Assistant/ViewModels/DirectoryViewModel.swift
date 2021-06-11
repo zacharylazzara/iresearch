@@ -44,10 +44,16 @@ class DirectoryViewModel: ObservableObject {
     // TODO: Also look into outline groups (this is what we'd use for iOS I think) https://developer.apple.com/documentation/swiftui/outlinegroup
     
     public func loadData(file: File) -> Data {
+        /* TODO:
+         If we create a directory, then navigate back to the parent directory, this crashes. It's likely because we haven't properly initialized the child directory?
+         */
+        
+        print("Loading data from \(file.name)")
         return load(file: file)!.1!
     }
     
     public func loadDir(file: File) -> [File] {
+        print("Loading directory \(file.name)")
         return load(file: file)!.0!
     }
     
@@ -106,6 +112,18 @@ class DirectoryViewModel: ObservableObject {
         do {
             let newDir = File(url: directory.url.appendingPathComponent(uName), name: uName)
             try fm.createDirectory(at: newDir.url, withIntermediateDirectories: false, attributes: nil)
+            
+            print("NEWDIR: \(newDir.isDir())")
+            print("NEWDIR: \(newDir.url)")
+            print("NEWDIR: \(newDir.url.hasDirectoryPath)")
+            
+            
+            /*
+             TODO: For some reason this isn't creating a directory. It becomes a directory on the next run but it starts off as a file?
+             */
+            
+            newDir.children = loadDir(file: newDir)
+            
             directory.children!.append(newDir)
             
             // TODO: we need to refresh the view somehow
