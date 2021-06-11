@@ -36,7 +36,6 @@
 		B6A5101C2671249200827BE0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B6A50FB7266E8D2B00827BE0 /* Assets.xcassets */; };
 		B6A5101F267140C800827BE0 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5101E267140C800827BE0 /* AppGroup.swift */; };
 		B6A51020267140C800827BE0 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5101E267140C800827BE0 /* AppGroup.swift */; };
-		B84E030F2674067300F0817B /* ErrorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84E030E2674067300F0817B /* ErrorType.swift */; };
 		B84E03112674193800F0817B /* Directory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84E03102674193800F0817B /* Directory.swift */; };
 		B84E03132674194200F0817B /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84E03122674194200F0817B /* Document.swift */; };
 /* End PBXBuildFile section */
@@ -115,7 +114,6 @@
 		B6A510142671183800827BE0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6A5101D26713FE300827BE0 /* Research Assistant.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Research Assistant.entitlements"; sourceTree = "<group>"; };
 		B6A5101E267140C800827BE0 /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
-		B84E030E2674067300F0817B /* ErrorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorType.swift; sourceTree = "<group>"; };
 		B84E03102674193800F0817B /* Directory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Directory.swift; sourceTree = "<group>"; };
 		B84E03122674194200F0817B /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -250,7 +248,6 @@
 				B6A50FEB266EB98700827BE0 /* File.swift */,
 				B6A50FF1266FADCE00827BE0 /* FileType.swift */,
 				B6A5101E267140C800827BE0 /* AppGroup.swift */,
-				B84E030E2674067300F0817B /* ErrorType.swift */,
 				B84E03102674193800F0817B /* Directory.swift */,
 				B84E03122674194200F0817B /* Document.swift */,
 			);
@@ -437,7 +434,6 @@
 				B84E03132674194200F0817B /* Document.swift in Sources */,
 				B6A50FBD266E8D2B00827BE0 /* Persistence.swift in Sources */,
 				B6A50FF82670EDFB00827BE0 /* NotesView.swift in Sources */,
-				B84E030F2674067300F0817B /* ErrorType.swift in Sources */,
 				B6A50FF2266FADCE00827BE0 /* FileType.swift in Sources */,
 				B6A50FF62670EDE500827BE0 /* CitationGeneratorView.swift in Sources */,
 				B6A50FFA2670EE1100827BE0 /* BookmarksView.swift in Sources */,

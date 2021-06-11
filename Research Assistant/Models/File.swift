@@ -7,40 +7,6 @@
 
 import Foundation
 
-
-/* TODO: we should implement File in such a way we can iterate recursively. This will make things significantly easier and more efficient. For now however I'll leave it as is, just to get things figured out and working. After I've gotten everything barely working, I'll start refining and polishing things (including implementing resursion where possible, such as with file navigation).
- 
- 
- 
- 
- 
- 
- 
- 
- struct File: Hashable, Identifiable, CustomStringConvertible {
-     var id: Self { self } // The ID will double as the URL to the document
-     var name: String
-     var children: [File]?
-     var description: String {
-         switch children {
-         case nil:
-             return "📄 \(name)"
-         case .some(let children):
-             return children.isEmpty ? "📂 \(name)" : "📁 \(name)"
-         }
-     }
-     
-     init(name: String, children: [File]? = nil) {
-         self.name = name
-         self.children = children
-     }
-     
-     
- */
-
-
-
-// TODO: it would probably make more sense to use inheritance instead of the way I'm doing this currently. Should have three classes: file, document, directory. (document and directory inherit from file)
 class File: Identifiable, CustomStringConvertible, Comparable {
     static func == (lhs: File, rhs: File) -> Bool {
         return lhs.name == rhs.name
