@@ -13,7 +13,10 @@ struct DirectoryView: View {
     var body: some View {
         //Text("Directories").foregroundColor(.gray) // We could change the name to match the directory we're in; when we're not in the root directory add a back button?
         
-        Text(dirVM.currentDir ?? "ERROR: Directory Not Found").foregroundColor(.gray)
+        Button(action: {  } ) {
+            Text("\(dirVM.rootDir ? Image(systemName: "folder.circle") : Image(systemName: "chevron.left")) \(dirVM.currentDir ?? "ERROR: Directory Not Found")")
+                .foregroundColor(dirVM.rootDir ? .secondary : .primary)
+        }.disabled(dirVM.rootDir)
         
         ForEach(dirVM.files) { file in
             if file.type == FileType.DIR {

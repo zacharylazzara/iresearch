@@ -21,6 +21,7 @@ class DirectoryViewModel: ObservableObject {
     
     @Published public var files: [File]
     @Published public var currentDir: String?
+    @Published public var rootDir: Bool
     
     init() {
         self.fm = FileManager.default
@@ -28,6 +29,7 @@ class DirectoryViewModel: ObservableObject {
         self.libraryPath = self.appGroupPath + "Library/"
         self.rootPath = self.libraryPath + "Papers/"
         self.files = [File]()
+        rootDir = true
         
         self.currentPath = self.rootPath
         
@@ -48,9 +50,32 @@ class DirectoryViewModel: ObservableObject {
         }
     }
     
+    
+    // TODO: look into  https://developer.apple.com/documentation/appkit/nsoutlineview
+    // TODO: Also look into outline groups (this is what we'd use for iOS I think) https://developer.apple.com/documentation/swiftui/outlinegroup
+    
+    
+    // TODO: load should iterate recursively; we want to make a doubly linked list for our files
+//    var root: File
+//
+//    private func load(file: File) throws {
+//        fm.changeCurrentDirectoryPath(file.description)
+//        root.children = try fm.contentsOfDirectory(atPath: fm.currentDirectoryPath)
+//
+//
+//
+//    }
+//
+    
     private func load(path: String) {
         currentPath = path
-        currentDir = currentPath
+        currentDir = URL(fileURLWithPath: currentPath).lastPathComponent
+        
+        if currentPath == rootPath {
+            rootDir = true
+        } else {
+            rootDir = false
+        }
         
         self.files.removeAll()
         print("Loading files from: \(path)")
@@ -105,6 +130,8 @@ class DirectoryViewModel: ObservableObject {
     public func cDir(dir: String) {
         load(path: currentPath + dir)
     }
+    
+    
     
     public func getData(file: File) -> Data? {
         var data: Data?
