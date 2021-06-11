@@ -38,7 +38,7 @@ class DirectoryViewModel: ObservableObject {
         }
         
         self.directory = Directory(url: self.rootURL, name: self.rootURL.lastPathComponent)
-        self.directory.children = load(file: self.directory)
+        self.directory.children = load(dir: self.directory)
     }
     
     // TODO: we can use .DS_Store to store our custom attributes such as which files are flagged etc
@@ -58,47 +58,77 @@ class DirectoryViewModel: ObservableObject {
         return self.directory.children!
     }
     
-    private func load(file: File) -> [File]? {
-        print("Loading from file: \(file.name)")
+    private func load(dir: Directory) -> [File]? {
+        print("Loading from directory: \(dir.name)")
         
+        var children = [File]()
+        let fileChildren: [URL]
         
-        
-        if let dir = file as? Directory {
-            print("File is a directory")
-            
-            var children = [File]()
-            let fileChildren: [URL]
-            
-            do {
-                fileChildren = try fm.contentsOfDirectory(at: dir.url, includingPropertiesForKeys: nil) // TODO: look into includingPropertiesForKeys, maybe we can get dates and such with it?
-            } catch {
-                print(error)
-                return nil
-            }
-            
-            print("Found: \(fileChildren)")
-            
-            for url in fileChildren {
-                let child: File
-                
-                if (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory)! {
-                    child = Directory(url: url, name: url.lastPathComponent, parent: dir)
-                } else {
-                    child = Document(url: url, name: url.lastPathComponent, parent: dir)
-                }
-                
-                if let childDir = child as? Directory {
-                    childDir.children = load(file: childDir)
-                }
-                
-                children.append(child)
-                //children?.sort()
-            }
-            
-            return children
-        } else {
+        do {
+            fileChildren = try fm.contentsOfDirectory(at: dir.url, includingPropertiesForKeys: nil) // TODO: look into includingPropertiesForKeys, maybe we can get dates and such with it?
+        } catch {
+            print(error)
             return nil
         }
+        
+        print("Found: \(fileChildren)")
+        
+        for url in fileChildren {
+            let child: File
+            
+            if (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory)! {
+                child = Directory(url: url, name: url.lastPathComponent, parent: dir)
+                (child as! Directory).children = load(dir: child as! Directory)
+            } else {
+                child = Document(url: url, name: url.lastPathComponent, parent: dir)
+            }
+            
+            children.append(child)
+            //children?.sort()
+        }
+        
+        return children
+        
+        
+        
+        
+//        if let dir = file as? Directory {
+//            print("File is a directory")
+//
+//            var children = [File]()
+//            let fileChildren: [URL]
+//
+//            do {
+//                fileChildren = try fm.contentsOfDirectory(at: dir.url, includingPropertiesForKeys: nil) // TODO: look into includingPropertiesForKeys, maybe we can get dates and such with it?
+//            } catch {
+//                print(error)
+//                return nil
+//            }
+//
+//            print("Found: \(fileChildren)")
+//
+//            for url in fileChildren {
+//                let child: File
+//
+//                if (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory)! {
+//                    child = Directory(url: url, name: url.lastPathComponent, parent: dir)
+//                    (child as! Directory).children = load(file: child as! Directory)
+//                } else {
+//                    child = Document(url: url, name: url.lastPathComponent, parent: dir)
+//                }
+//
+////                if let childDir = child as? Directory {
+////                    childDir.children = load(file: childDir)
+////                }
+//
+//                children.append(child)
+//                //children?.sort()
+//            }
+//
+//            return children
+//        } else {
+//            return nil
+//        }
     }
     
     public func createDir(name: String = "New Folder") {
@@ -114,7 +144,7 @@ class DirectoryViewModel: ObservableObject {
         do {
             let newDir = Directory(url: self.directory.url.appendingPathComponent(uName), name: uName, parent: self.directory)
             try fm.createDirectory(at: newDir.url, withIntermediateDirectories: false, attributes: nil)
-            newDir.children = load(file: newDir)
+            newDir.children = load(dir: newDir)
             self.directory.children?.append(newDir)
             
             // TODO: we need to refresh the view somehow! Ideally it would be done as a result of data changing, but if that's not feasible we can just do it here somehow
