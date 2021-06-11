@@ -17,12 +17,14 @@ struct DirectoryView: View {
         }.disabled(dirVM.directory.isRoot())
         
         ForEach(dirVM.directory.children!) { file in
-            if file.isDir() {
-                Button(action: { dirVM.cDir(dir: file.name) }) {
-                    Text("\(Image(systemName: "folder")) \(file.name)")
+            if !file.isHidden() || dirVM.showHidden {
+                if file.isDir() {
+                    Button(action: { dirVM.cDir(dir: file.name) }) {
+                        Text("\(Image(systemName: "folder")) \(file.name)")
+                    }
+                } else {
+                    NavigationLink(destination: (file.isDir() ? nil : PDFKitRepresentedView(dirVM.loadData(file: file)))) { Text("\(Image(systemName: (file.isDir() ? "folder" : "doc.text"))) \(file.name)") }
                 }
-            } else {
-                NavigationLink(destination: (file.isDir() ? nil : PDFKitRepresentedView(dirVM.loadData(file: file)))) { Text("\(Image(systemName: (file.isDir() ? "folder" : "doc.text"))) \(file.name)") }
             }
         }
         

@@ -109,4 +109,8 @@ class File: Identifiable, Comparable, CustomStringConvertible {
     func isDir() -> Bool {
         return (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory)!
     }
+    
+    func isHidden() -> Bool {
+        return (try? url.resourceValues(forKeys: [.isHiddenKey]).isHidden)!
+    }
 }

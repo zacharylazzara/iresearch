@@ -18,26 +18,28 @@ class DirectoryViewModel: ObservableObject {
     private let rootURL: URL
     
     @Published public var directory: File
+    @Published public var showHidden: Bool
     
     
     init() {
         self.fm = FileManager.default
         self.rootURL = AppGroup.library.containerURL.appendingPathComponent("Library", isDirectory: true).appendingPathComponent("Papers", isDirectory: true)
+        self.showHidden = false
         
-        print("Root URL: \(rootURL)")
+        print("Root URL: \(self.rootURL)")
         
-        if !fm.fileExists(atPath: rootURL.path) {
+        if !self.fm.fileExists(atPath: self.rootURL.path) {
             do {
-                print("\(rootURL.lastPathComponent) doesn't exist! Creating directory...")
-                try fm.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
-                print("Successfully created \(rootURL.lastPathComponent)!")
+                print("\(self.rootURL.lastPathComponent) doesn't exist! Creating directory...")
+                try self.fm.createDirectory(at: self.rootURL, withIntermediateDirectories: true, attributes: nil)
+                print("Successfully created \(self.rootURL.lastPathComponent)!")
             } catch {
                 print(error)
             }
         }
         
-        directory = File(url: self.rootURL, name: self.rootURL.lastPathComponent)
-        directory.children = loadDir(file: directory)
+        self.directory = File(url: self.rootURL, name: self.rootURL.lastPathComponent)
+        self.directory.children = loadDir(file: self.directory)
     }
     
     // TODO: we can use .DS_Store to store our custom attributes such as which files are flagged etc
@@ -106,10 +108,10 @@ class DirectoryViewModel: ObservableObject {
         }
         
         do {
-            let newDir = File(url: directory.url.appendingPathComponent(uName), name: uName, parent: directory)
+            let newDir = File(url: self.directory.url.appendingPathComponent(uName), name: uName, parent: self.directory)
             try fm.createDirectory(at: newDir.url, withIntermediateDirectories: false, attributes: nil)
             newDir.children = loadDir(file: newDir)
-            directory.children!.append(newDir)
+            self.directory.children!.append(newDir)
             
             // TODO: we need to refresh the view somehow
         } catch {
@@ -122,10 +124,10 @@ class DirectoryViewModel: ObservableObject {
     }
     
     public func pDir() {
-        directory = directory.parent ?? directory
+        self.directory = self.directory.parent ?? self.directory
     }
     
     public func cDir(dir: String) {
-        directory = (directory.children!.first(where: { child in child.name == dir }))!
+        self.directory = (self.directory.children!.first(where: { child in child.name == dir }))!
     }
 }
