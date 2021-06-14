@@ -113,11 +113,26 @@ class DirectoryViewModel: ObservableObject {
     
     public func delete(offsets: IndexSet) {
         offsets.forEach { offset in
-            //try! self.fm.trashItem(at: (self.directory.children?[offset].url)!, resultingItemURL: nil) // TODO: get url from trash later so we can potentially restore if needed (also need to implement a way to empty the trash?)
-            
             try! self.fm.removeItem(at: self.directory.children![offset].url)
         }
         self.directory.children?.remove(atOffsets: offsets)
+        objectWillChange.send()
+    }
+    
+    public func move(offsets: IndexSet, destinationIndex: Int) {
+        // We just need to change the parent, as well as move the file on the file system (and also, update it in the children)
+        offsets.forEach { offset in
+            let mover = self.directory.children![offset]
+            let destination = self.directory.children![destinationIndex] as! Directory
+            
+            try! self.fm.moveItem(at: mover.url, to: destination.url)
+            
+            mover.parent?.children?.remove(at: offset)
+            mover.parent = destination
+            mover.url = destination.url.appendingPathComponent(mover.url.lastPathComponent)
+            destination.children?.append(mover)
+        }
+        
         objectWillChange.send()
     }
 }

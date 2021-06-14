@@ -26,7 +26,9 @@ struct DirectoryView: View {
                     NavigationLink(destination: (PDFKitRepresentedView(dirVM.loadData(doc: file as! Document)))) { Text("\(Image(systemName: ("doc.text"))) \(file.name)") }
                 }
             }
-        }.onDelete(perform: delete)
+        }
+        .onDelete(perform: delete)
+        //.onMove(perform: move) // TODO: get this working at some point (this is a lower priority however so it can be implemented later)
         
         Divider()
         
@@ -41,6 +43,17 @@ struct DirectoryView: View {
             print("Deleting \(((file as? Directory) != nil) ? "directory" : "document"): \(file.name)")
             dirVM.delete(offsets: offsets)
         }
+    }
+    
+    func move(offsets: IndexSet, destinationIndex: Int) {
+        if !offsets.contains(destinationIndex) { // We can't put our items into themselves, so make sure the offsets don't contain the destination
+            dirVM.move(offsets: offsets, destinationIndex: destinationIndex)
+        }
+        
+        
+        // TODO: we can use this to move files into other directories; doesn't seem to let us slide to rename though
+        // TODO: we should allow the user to re-order the list as well, since they can reorder it by dragging things around. We'll probably need to store this in DS_Store but idk for sure
+        
     }
 }
 

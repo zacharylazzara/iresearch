@@ -17,8 +17,8 @@ class File: Identifiable, CustomStringConvertible, Comparable {
     }
     
     var id: URL { url }
-    let url: URL
-    let parent: Directory?
+    var url: URL
+    var parent: Directory?
     var name: String
     
     let added: Date?

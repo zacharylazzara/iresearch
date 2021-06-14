@@ -44,58 +44,47 @@ class ActionViewController: UIViewController {
         }
     }
     
-    @IBAction func add() { // We have a lot of duplicate code here shared with the DirectoryView (or its ViewModel); we should try to put this stuff in a single place
+    @IBAction func add() { // We have a lot of duplicate code here shared with the DirectoryViewModel; we should try to put this stuff in a single place if possible
         let fm = FileManager.default
+        let rootURL = AppGroup.library.containerURL.appendingPathComponent("Library", isDirectory: true).appendingPathComponent("Papers", isDirectory: true)
         
-        let appGroupPath = fm.containerURL(forSecurityApplicationGroupIdentifier: AppGroup.library.containerURL.path)!.path
-        let libraryPath = appGroupPath + "/Library/"
-        let papersPath = libraryPath + "Papers/"
+        print("Root URL: \(rootURL)")
         
-        var safeToWrite = false
-        
-        if !fm.fileExists(atPath: appGroupPath) && fm.fileExists(atPath: libraryPath) {
-            print("Unable to find AppGroup or Library directories!")
-            // TODO: we need to display an error to the user
-        } else if fm.fileExists(atPath: papersPath) {
-            print("Checking files in: \(papersPath)")
+        if !fm.fileExists(atPath: rootURL.path) {
             do {
-                let files = try fm.contentsOfDirectory(atPath: papersPath)
-                print("Found: \(files)")
-                
-                // TODO: we should ask the user what to do when a conflict is found (for now, just auto-rename)
-                
-                var checkTitle = pdfTitle!
-                var collisions = 0
-                
-                while files.contains(checkTitle) {
-                    checkTitle = pdfTitle!
-                    collisions += 1
-                    checkTitle = "(\(collisions))\(checkTitle)"
-                }
-                
-                pdfTitle = checkTitle
-                safeToWrite = true
+                print("\(rootURL.lastPathComponent) doesn't exist! Creating directory...")
+                try fm.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
+                print("Successfully created \(rootURL.lastPathComponent)!")
             } catch {
                 print(error)
-            }
-        } else {
-            print("\(papersPath) does not exist! Creating directory...")
-            do {
-                try fm.createDirectory(atPath: papersPath, withIntermediateDirectories: true, attributes: nil)
-                safeToWrite = true
-            } catch {
-                print(error)
+                return
             }
         }
         
-        if safeToWrite {
-            pdfDoc!.write(to: URL(fileURLWithPath: papersPath + pdfTitle!))
+        do {
+            let files = try fm.contentsOfDirectory(at: rootURL, includingPropertiesForKeys: nil)
+            print("Found: \(files)")
+            
+            // TODO: we should ask the user what to do when a conflict is found (for now, just auto-rename)
+            
+            var uName = pdfTitle!
+            var collisions = 0
+            
+            while files.contains(where: {file in file.lastPathComponent == uName}) {
+                uName = pdfTitle!
+                collisions += 1
+                uName = "(\(collisions))\(uName)"
+            }
+            
+            pdfDoc!.write(to: rootURL.appendingPathComponent(uName))
             
             do {
-                print("Found (after writing): \(try fm.contentsOfDirectory(atPath: papersPath))")
+                print("Found (after writing): \(try fm.contentsOfDirectory(at: rootURL, includingPropertiesForKeys: nil))")
             } catch {
                 print(error)
             }
+        } catch {
+            print(error)
         }
         
         self.extensionContext!.completeRequest(returningItems: self.extensionContext!.inputItems, completionHandler: nil)
