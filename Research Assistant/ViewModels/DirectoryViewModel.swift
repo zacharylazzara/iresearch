@@ -15,29 +15,29 @@ import Foundation
 
 class DirectoryViewModel: ObservableObject {
     private let fm: FileManager
-    private let rootURL: URL
+    private let documents: URL
     
     @Published public var directory: Directory
     @Published public var showHidden: Bool
     
     init() {
         self.fm = FileManager.default
-        self.rootURL = AppGroup.library.containerURL.appendingPathComponent("Library", isDirectory: true).appendingPathComponent("Papers", isDirectory: true)
+        self.documents = AppGroup.documents.containerURL //AppGroup.library.containerURL.appendingPathComponent("Library", isDirectory: true).appendingPathComponent("Papers", isDirectory: true)
         self.showHidden = false
         
-        print("Root URL: \(self.rootURL)")
+        print("Root URL: \(self.documents)")
         
-        if !self.fm.fileExists(atPath: self.rootURL.path) {
-            do {
-                print("\(self.rootURL.lastPathComponent) doesn't exist! Creating directory...")
-                try self.fm.createDirectory(at: self.rootURL, withIntermediateDirectories: true, attributes: nil)
-                print("Successfully created \(self.rootURL.lastPathComponent)!")
-            } catch {
-                print(error)
-            }
-        }
+//        if !self.fm.fileExists(atPath: self.rootURL.path) {
+//            do {
+//                print("\(self.rootURL.lastPathComponent) doesn't exist! Creating directory...")
+//                try self.fm.createDirectory(at: self.rootURL, withIntermediateDirectories: true, attributes: nil)
+//                print("Successfully created \(self.rootURL.lastPathComponent)!")
+//            } catch {
+//                print(error)
+//            }
+//        }
         
-        self.directory = Directory(url: self.rootURL, name: self.rootURL.lastPathComponent)
+        self.directory = Directory(url: self.documents, name: self.documents.lastPathComponent)
         self.directory.children = load(dir: self.directory)
     }
     

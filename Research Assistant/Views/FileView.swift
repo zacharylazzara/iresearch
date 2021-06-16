@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FileView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
-    let id: URL
+    //let ids: [URL]
     @State var files: [File]?
     
     var body: some View {
@@ -20,9 +20,9 @@ struct FileView: View {
                 PreviewController(files: files!)
             }
         }
-        .navigationTitle(files?.count ?? 0 < 2 ? files?[0].name ?? "Loading..." : "\(files!.count) Documents")
+        .navigationTitle(files?.count ?? 0 < 2 ? (files?.indices.contains(0))! ? (files?[0].name ?? "Loading...") : "Empty Directory" : "\(files!.count) Documents")
         .onAppear() {
-            files = dirVM.loadDir().filter({ file in file.id == id }) // TODO: we can preview entire folders like this if we load only children of the folder
+            //files = dirVM.loadDir().filter({ file in ids.contains(file.id) }) // TODO: we can preview entire folders like this if we load only children of the folder
         }
     }
 }

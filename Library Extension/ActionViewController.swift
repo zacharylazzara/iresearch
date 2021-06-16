@@ -46,23 +46,23 @@ class ActionViewController: UIViewController {
     
     @IBAction func add() { // We have a lot of duplicate code here shared with the DirectoryViewModel; we should try to put this stuff in a single place if possible
         let fm = FileManager.default
-        let rootURL = AppGroup.library.containerURL.appendingPathComponent("Library", isDirectory: true).appendingPathComponent("Papers", isDirectory: true)
+        let documents = AppGroup.documents.containerURL//AppGroup.root.containerURL.appendingPathComponent("Library", isDirectory: true).appendingPathComponent("Papers", isDirectory: true)
         
-        print("Root URL: \(rootURL)")
+        print("Root URL: \(documents)")
         
-        if !fm.fileExists(atPath: rootURL.path) {
-            do {
-                print("\(rootURL.lastPathComponent) doesn't exist! Creating directory...")
-                try fm.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
-                print("Successfully created \(rootURL.lastPathComponent)!")
-            } catch {
-                print(error)
-                return
-            }
-        }
+//        if !fm.fileExists(atPath: rootURL.path) {
+//            do {
+//                print("\(rootURL.lastPathComponent) doesn't exist! Creating directory...")
+//                try fm.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
+//                print("Successfully created \(rootURL.lastPathComponent)!")
+//            } catch {
+//                print(error)
+//                return
+//            }
+//        }
         
         do {
-            let files = try fm.contentsOfDirectory(at: rootURL, includingPropertiesForKeys: nil)
+            let files = try fm.contentsOfDirectory(at: documents, includingPropertiesForKeys: nil)
             print("Found: \(files)")
             
             // TODO: we should ask the user what to do when a conflict is found (for now, just auto-rename)
@@ -76,10 +76,10 @@ class ActionViewController: UIViewController {
                 uName = "(\(collisions))\(uName)"
             }
             
-            pdfDoc!.write(to: rootURL.appendingPathComponent(uName))
+            pdfDoc!.write(to: documents.appendingPathComponent(uName))
             
             do {
-                print("Found (after writing): \(try fm.contentsOfDirectory(at: rootURL, includingPropertiesForKeys: nil))")
+                print("Found (after writing): \(try fm.contentsOfDirectory(at: documents, includingPropertiesForKeys: nil))")
             } catch {
                 print(error)
             }
