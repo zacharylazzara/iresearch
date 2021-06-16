@@ -9,15 +9,16 @@ import SwiftUI
 
 struct DirectoryView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
-    @State private var viewDirContents: Bool = true
+    @State private var viewDirContents: Bool = false
+    
+    // TODO: sometimes when visiting a directory the view doesn't update to the new directory's contents
     
     var body: some View {
-        NavigationLink(destination: (FileView(files: dirVM.directory.children)), isActive: $viewDirContents) {}
-        
-        Button(action: { changeDir(dir: dirVM.directory.parent!) } ) {
+        Button(action: { changeDir(dir: dirVM.directory.parent) } ) {
             Text("\(dirVM.directory.isRoot() ? Image(systemName: "folder.circle") : Image(systemName: "chevron.left")) \(dirVM.directory.name)")
                 .foregroundColor(dirVM.directory.isRoot() ? .secondary : .primary)
-        }.disabled(dirVM.directory.isRoot())
+            NavigationLink(destination: (FileView(files: dirVM.directory.children)), isActive: $viewDirContents) {}.hidden()
+        }
         
         ForEach(dirVM.loadDir()) { file in
             if !file.isHidden() || dirVM.showHidden {
@@ -44,8 +45,11 @@ struct DirectoryView: View {
         }
     }
     
-    func changeDir(dir: Directory) {
-        dirVM.changeDir(dir: dir)
+    func changeDir(dir: Directory?) {
+        if dir != nil {
+            dirVM.changeDir(dir: dir!)
+        }
+        
         viewDirContents = true
     }
     

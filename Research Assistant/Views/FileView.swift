@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct FileView: View {
-    @EnvironmentObject var dirVM: DirectoryViewModel
-    //let ids: [URL]
+    //@EnvironmentObject var dirVM: DirectoryViewModel // TODO: we may need this later so we can save files and keep track of their changes
     @State var files: [File]?
     
     var body: some View {
@@ -20,10 +19,13 @@ struct FileView: View {
                 PreviewController(files: files!)
             }
         }
-        .navigationTitle(files?.count ?? 0 < 2 ? (files?.indices.contains(0))! ? (files?[0].name ?? "Loading...") : "Empty Directory" : "\(files!.count) Documents")
-        .onAppear() {
-            //files = dirVM.loadDir().filter({ file in ids.contains(file.id) }) // TODO: we can preview entire folders like this if we load only children of the folder
-        }
+        
+        // TODO: the file count doesn't update when we delete or create a file (we likely need a binding variable or to use the environment object)
+        
+        .navigationTitle(files?.count ?? 0 < 2 ? (files?.indices.contains(0))! ? files?[0].name ?? "Loading..." : "Empty Directory" : "\(files!.count) Files")
+//        .onAppear() { // May use this (or something like this) later if we need to save files
+//            //files = dirVM.loadDir().filter({ file in ids.contains(file.id) })
+//        }
     }
 }
 
