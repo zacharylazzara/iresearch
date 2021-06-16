@@ -6,12 +6,13 @@
 //
 
 import Foundation
+import QuickLook
 
-class File: Identifiable, CustomStringConvertible, Comparable {
+class File: NSObject, Identifiable, Comparable {
     static func == (lhs: File, rhs: File) -> Bool {
         return lhs.name == rhs.name
     }
-
+    
     static func < (lhs: File, rhs: File) -> Bool {
         return lhs.name < rhs.name
     }
@@ -40,7 +41,7 @@ class File: Identifiable, CustomStringConvertible, Comparable {
         self.archived = false
     }
     
-    var description: String {
+    override var description: String {
         switch parent {
         case nil:
             return "ROOT: \(name)"
@@ -51,5 +52,15 @@ class File: Identifiable, CustomStringConvertible, Comparable {
     
     func isHidden() -> Bool {
         return (try? url.resourceValues(forKeys: [.isHiddenKey]).isHidden)!
+    }
+}
+
+extension File: QLPreviewItem {
+    var previewItemURL: URL? {
+        url
+    }
+    
+    var previewItemTitle: String? {
+        name
     }
 }

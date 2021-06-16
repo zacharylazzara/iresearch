@@ -46,6 +46,8 @@ class DirectoryViewModel: ObservableObject {
     // TODO: Also look into outline groups (this is what we'd use for iOS I think) https://developer.apple.com/documentation/swiftui/outlinegroup
     // TODO: we need to auto-update the view when the directory's children change (currently view only updates when the directory changes, but not when it gets new folders)
     
+    // TODO: a view stabalization feature may be useful so people can read while walking? we want to target this at people who are mobile, so things have to be quick, easy, and intuitive
+    
     public func changeDir(dir: Directory) { // TODO: maybe check to make sure we don't try to change to a data file vs a directory?
         self.directory = dir
     }
@@ -135,4 +137,11 @@ class DirectoryViewModel: ObservableObject {
         
         objectWillChange.send()
     }
+    
+    
+    
+    
+    
+    
+    
 }

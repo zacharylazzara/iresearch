@@ -23,7 +23,7 @@ struct DirectoryView: View {
                         Text("\(Image(systemName: "folder")) \(file.name)")
                     }
                 } else {
-                    NavigationLink(destination: (PDFKitRepresentedView(dirVM.loadData(doc: file as! Document)))) { Text("\(Image(systemName: ("doc.text"))) \(file.name)") }
+                    NavigationLink(destination: (FileView(id: file.id))) { Text("\(Image(systemName: ("doc.text"))) \(file.name)") }
                 }
             }
         }
