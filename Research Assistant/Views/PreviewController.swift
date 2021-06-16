@@ -15,19 +15,45 @@ struct PreviewController: UIViewControllerRepresentable {
     
     let files: [File]
     
-    func makeUIViewController(context: Context) -> QLPreviewController {
+    //    func makeUIViewController(context: Context) -> QLPreviewController {
+    //        let controller = QLPreviewController()
+    //        controller.dataSource = context.coordinator
+    //        return controller
+    //    }
+    //
+    //    func updateUIViewController(
+    //        _ uiViewController: QLPreviewController, context: Context) {}
+    //
+    //
+    //    func makeCoordinator() -> Coordinator {
+    //        return Coordinator(parent: self)
+    //    }
+    
+    func makeUIViewController(context: Context) -> UINavigationController {
         let controller = QLPreviewController()
         controller.dataSource = context.coordinator
-        return controller
+        //            controller.navigationItem.leftBarButtonItem = UIBarButtonItem(
+        //                barButtonSystemItem: .done, target: context.coordinator, action: #selector(context.coordinator.dismiss)
+        //            )
+        
+        let navigationController = UINavigationController(rootViewController: controller)
+        return navigationController
     }
     
-    func updateUIViewController(
-        _ uiViewController: QLPreviewController, context: Context) {}
-    
+    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
     
     func makeCoordinator() -> Coordinator {
         return Coordinator(parent: self)
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     class Coordinator: QLPreviewControllerDataSource {
         
@@ -47,8 +73,8 @@ struct PreviewController: UIViewControllerRepresentable {
         
         // From: https://www.raywenderlich.com/10447506-quicklook-previews-for-ios-getting-started
         func previewController(_ controller: QLPreviewController, editingModeFor previewItem: QLPreviewItem) -> QLPreviewItemEditingMode {
-            //.updateContents
-            .createCopy // TODO: need to make sure that when users edit an already edited file, we don't make a new copy (should have master copy and note copy)
+            .updateContents
+            //.createCopy // TODO: need to make sure that when users edit an already edited file, we don't make a new copy (should have master copy and note copy)
         }
     }
 }
