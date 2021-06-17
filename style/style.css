@@ -1,0 +1,120 @@
+body {
+    background: url(../res/photos/unsplash_photo.jpeg) no-repeat center fixed, black;
+    background-size: cover;
+}
+
+.main {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(51, 26, 0, 0.5);
+    -webkit-backdrop-filter: blur(5px) sepia(70%);
+    backdrop-filter: blur(5px) sepia(70%);
+}
+
+#content {
+    width: 80%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+    margin-bottom: 5em;
+}
+
+#demo {
+    width: 90%;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+    margin-bottom: 5em;
+}
+
+h1 {
+    color: white;
+}
+
+h4 {
+    color: #b3b3b3;
+}
+
+#figma {
+    float: right;
+    width: 60%;
+    height: 50em;
+    border: none;
+    border-radius: 20px;
+    opacity: 1;
+    background-color: black;
+}
+
+#app {
+    float: left;
+    width: 40%;
+    border: none;
+    border-radius: 20px;
+    opacity: 1;
+}
+
+#info {
+    padding-left: 1em;
+    float: right;
+    width: 60%;
+}
+
+#feedback {
+    padding-right: 1em;
+    float: left;
+    width: 40%;
+    height: 80%;
+}
+
+#survey {
+    width: 100%;
+    height: 100%;
+}
+
+@viewport {
+    width: device-width;
+    zoom: 1;
+}
+
+@media only screen and (orientation:portrait) {
+    .main {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    #content {
+        width: 90%;
+    }
+    
+    #figma {
+        float: none;
+        width: 100%;
+        height: 50em;
+    }
+
+    #app {
+        float: none;
+        width: 100%;
+    }
+    
+    #info {
+        padding-left: 0em;
+        padding-bottom: 1em;
+        float: none;
+        width: 100%;
+    }
+
+    #feedback {
+        padding-right: 0em;
+        padding-bottom: 1em;
+        float: none;
+        width: 100%;
+        height: 50em;
+    }
+}
