@@ -21,7 +21,7 @@ struct SidebarView: View {
             Divider()
             
             Group {
-                NavigationLink(destination: ImportView(), tag: 2, selection: $selection) { Text("\(Image(systemName: "tray.and.arrow.down.fill")) Import Documents") }
+                NavigationLink(destination: AutoLiteratureReviewView(), tag: 2, selection: $selection) { Text("\(Image(systemName: "tray.and.arrow.down.fill")) Auto-Literature Review") }
                 NavigationLink(destination: CitationGeneratorView(), tag: 3, selection: $selection) { Text("\(Image(systemName: "text.quote")) Generate Citations") }
                 NavigationLink(destination: NotesView(), tag: 4, selection: $selection) { Text("\(Image(systemName: "rectangle.and.paperclip")) Notes") }
                 NavigationLink(destination: BookmarksView(), tag: 5, selection: $selection) { Text("\(Image(systemName: "bookmark.fill")) Bookmarks") }
@@ -56,8 +56,8 @@ struct SidebarView: View {
         self.selection = 1
     }
     
-    private func importDocs() {
-        self.title = "Import"
+    private func autoLitRev() {
+        self.title = "Auto-Literature Review"
         self.selection = 2
     }
     

@@ -15,45 +15,35 @@
 
 import SwiftUI
 
-struct ImportView: View {
+struct AutoLiteratureReviewView: View {
     @State private var link: String = "" // TODO: download from link somehow
     
     /* TODO:
      We're gonna want to utilize the share menu so we can easily send documents to the app; perhaps we shouldn't even offer the link download option under Import?
      */
     
+    // TODO: change this to be the auto-literature review system
+    
     var body: some View {
         VStack(alignment: .leading) {
-            HStack() {
-                Button(action: download) {
-                    Image(systemName: "doc.text.viewfinder")
-                    Text("Photo Scan")
-                }
-                
-                Button(action: download) {
-                    Image(systemName: "books.vertical.fill")
-                    Text("Database")
-                }
+            // TODO: we should use a viewmodel to search the library for supporting papers
+            // TODO: controls to upload thesis here
+            Button(action: search) {
+                Image(systemName: "highlighter")
+                Text("Begin Auto-Literature Review")
             }
             
-            HStack() {
-                Button(action: download) {
-                    Image(systemName: "externaldrive.fill.badge.wifi")
-                    Text("Network")
-                }
-                
-                Button(action: download) {
-                    Image(systemName: "externaldrive.fill.badge.icloud")
-                    Text("Cloud")
-                }
-            }
         }
-        .navigationTitle("Import")
+        .navigationTitle("Auto-Literature Review")
         Spacer()
     }
     
-    private func download() {
-        
+    private func search() {
+        /* TODO:
+         Upload thesis (need a Word plugin, maybe even the ability to pull form Word? could do OneDrive integration so we can pull relevant files directly?)
+         Search through library
+         Search through databases (maybe)
+         */
     }
     
     
@@ -61,6 +51,6 @@ struct ImportView: View {
 
 struct ImportView_Previews: PreviewProvider {
     static var previews: some View {
-        ImportView()
+        AutoLiteratureReviewView()
     }
 }
