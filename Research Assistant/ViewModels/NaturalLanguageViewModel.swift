@@ -14,33 +14,13 @@ class NaturalLanguageViewModel {
     private let distanceThreshold: Double = 1.0
     private let sentimentThreshold: Double = 0.3 // This is a variance/difference (sentiment can only differ by the specified amount)
     
-    // TODO: make these private later
-    var doc1: String
-    var doc2: String
-//    var sents1: Array<String> = []
-//    var sents2: Array<String> = []
-    
-    private var sentDic: Dictionary<String, Array<String>>?
-    // TODO: we might want the dictionary to contain more than just an array; it needs an array of tuples which includes
-    // info on similarity (or distance), as well as sentiment. We may want other data in this dictionary such as keywords.
-    // We may want to make a class or an object of some sort to store this data (remember the Pokemon thing we did; there was
-    // a specific data type that was very powerful for these type of associations that don't need functions built in; a data class or something).
-    init(doc1: String, doc2: String, language: NLLanguage = .english) {
-        self.language = language
-        self.doc1 = doc1
-        self.doc2 = doc2
-//        sents1 = tokenize(text: doc1)
-//        sents2 = tokenize(text: doc2)
-    }
-    
-    
-    class Argument: CustomStringConvertible { // TODO: move this into its own file perhaps
-        let sentence: String
-        let sentiment: Double
-        let distance: Double? // TODO: distance should throw an exception if it's ever set to negative
-        let supporting: Bool?
+    public class Argument: CustomStringConvertible { // TODO: determine if this should be in its own file or not (I'm not sure what the best practice here is)
+        public let sentence: String // TODO: string should throw an exception if it's ever empty
+        public let sentiment: Double // TODO: enforce range [-1.0, 1.0]; if exceeded we should throw an exception
+        public let distance: Double? // TODO: distance should throw an exception if it's ever set to negative
+        public let supporting: Bool?
         
-        var args: Array<Argument> = []
+        public var args: Array<Argument> = []
         
         init(sentence: String, sentiment: Double, distance: Double? = nil, supporting: Bool? = nil) {
             self.sentence = sentence
@@ -52,6 +32,10 @@ class NaturalLanguageViewModel {
         public var description: String {
             return "\n\nSENTENCE: \(sentence), \nSENTIMENT: \(sentiment), \nDISTANCE: \(String(describing: distance ?? nil)), \nSUPPORTING: \(String(describing: supporting)), \nARGS: \(args)"
         }
+    }
+    
+    init(language: NLLanguage = .english) {
+        self.language = language
     }
     
     func argumentAnalysis(for doc1: String, against doc2: String) -> Array<Argument> {
@@ -78,7 +62,7 @@ class NaturalLanguageViewModel {
         return args
     }
     
-    func tokenize(text: String, unit: NLTokenUnit = .sentence) -> Array<String> {
+    func tokenize(text: String, by unit: NLTokenUnit = .sentence) -> Array<String> {
         let tokenizer = NLTokenizer(unit: unit)
         tokenizer.string = text
         
@@ -114,13 +98,36 @@ class NaturalLanguageViewModel {
     func sentenceDistance(sent1: String, sent2: String) -> Double {
         var distance: NLDistance?
         if let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: language) {
-//            if let vector = sentenceEmbedding.vector(for: sent1) {
-//                print (vector)
-//            }
             distance = sentenceEmbedding.distance(between: sent1, and: sent2, distanceType: .cosine)
         }
         return Double(distance!.description)!
     }
+    
+    func keywords(for doc: String) -> Array<(String, Int)> { // Returns the word + frequency
+        // TODO: we need to throw out stop words as well
+        
+        
+        
+        let words = tokenize(text: doc, by: .word)
+        let freq = words.reduce(into: [:]) { $0[$1, default: 0] += 1 } // From: https://stackoverflow.com/a/30545629/7653788
+        
+        var wFreq: Array<(String, Int)> = []
+        freq.sorted{ return $0.value > $1.value }.forEach { f in
+            wFreq.append((f.key, f.value))
+            
+            print(f)
+        }
+        
+        
+        
+        return wFreq
+    }
+    
+    
+    
+    // TODO: we want to find the best keywords/search terms; we'll need to know the word frequency for this
+    
+    
 //    // TODO: we use the above function to determine how similar the sentences are; we can now start implementing what we have in the Python experimental code
 //
 //    // First step is to tokenize the input text into sentences
