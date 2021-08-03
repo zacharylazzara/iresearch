@@ -60,8 +60,6 @@ struct AutoLiteratureReviewView: View {
              Will need to make a dictionary or list of all the texts in the repository, so that we can search through everything to find the relevant papers.
             */
             
-            thesis = thesis.replacingOccurrences(of: "- ", with: "")
-            citation = citation.replacingOccurrences(of: "- ", with: "")
             
             let nlViewModel = NaturalLanguageViewModel()
             

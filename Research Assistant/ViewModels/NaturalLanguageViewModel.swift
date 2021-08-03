@@ -10,6 +10,7 @@ import NaturalLanguage
 
 class NaturalLanguageViewModel {
     private let language:NLLanguage
+    private let artifacts = [("- ", "")] // Artifacts should be replaced by the associated feature; i.e., (artififact, replacement)
     private let stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
     
     public class Argument: CustomStringConvertible { // TODO: determine if this should be in its own file or not (I'm not sure what the best practice here is)
@@ -36,8 +37,12 @@ class NaturalLanguageViewModel {
         self.language = language
     }
     
-    private func sanitize(text: String) -> String {
-        return text.replacingOccurrences(of: "- ", with: "") // Any additional repairing/cleaning of the text should be done here
+    private func sanitize(text: String) -> String { // Any additional repairing/cleaning of the text should be done here
+        var sanitizedText: String = text
+        artifacts.forEach { artifact in
+            sanitizedText = sanitizedText.replacingOccurrences(of: artifact.0, with: artifact.1)
+        }
+        return sanitizedText
     }
     
     func citations(for doc1: String, from doc2: String, distanceThreshold: Double = 1.0, sentimentThreshold: Double = 0.3) -> Array<Argument> {
