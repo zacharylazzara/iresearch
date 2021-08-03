@@ -17,6 +17,16 @@ import SwiftUI
 
 struct AutoLiteratureReviewView: View {
     @State private var link: String = "" // TODO: download from link somehow
+    
+    // From: http://dx.doi.org/10.1016/j.neunet.2016.11.003
+    // Using this text for testing purposes for now.
+    @State private var citation: String = "The hard problem of consciousness is the problem of explaining how we experience qualia or phenome- nal experiences, such as seeing, hearing, and feeling, and knowing what they are. To solve this problem, a theory of consciousness needs to link brain to mind by modeling how emergent properties of several brain mechanisms interacting together embody detailed properties of individual conscious psychologi- cal experiences. This article summarizes evidence that Adaptive Resonance Theory, or ART, accomplishes this goal. ART is a cognitive and neural theory of how advanced brains autonomously learn to attend, rec- ognize, and predict objects and events in a changing world. ART has predicted that ‘‘all conscious states are resonant states’’ as part of its specification of mechanistic links between processes of consciousness, learning, expectation, attention, resonance, and synchrony. It hereby provides functional and mechanistic explanations of data ranging from individual spikes and their synchronization to the dynamics of con- scious perceptual, cognitive, and cognitive–emotional experiences. ART has reached sufficient maturity to begin classifying the brain resonances that support conscious experiences of seeing, hearing, feeling, and knowing. Psychological and neurobiological data in both normal individuals and clinical patients are clarified by this classification. This analysis also explains why not all resonances become conscious, and why not all brain dynamics are resonant. The global organization of the brain into computationally com- plementary cortical processing streams (complementary computing), and the organization of the cerebral cortex into characteristic layers of cells (laminar computing), figure prominently in these explanations of conscious and unconscious processes. Alternative models of consciousness are also discussed."
+    
+    // From: DOI 10.1007/s11023-014-9352-8
+    // Using this text for testing purposes for now.
+    @State private var thesis: String = "If a brain is uploaded into a computer, will consciousness continue in digital form or will it end forever when the brain is destroyed? Philosophers have long debated such dilemmas and classify them as questions about personal identity. There are currently three main theories of personal identity: biological, psycho- logical, and closest continuer theories. None of these theories can successfully address the questions posed by the possibility of uploading. I will argue that uploading requires us to adopt a new theory of identity, psychological branching identity. Psychological branching identity states that consciousness will continue as long as there is continuity in psychological structure. What differentiates this from psychological identity is that it allows identity to continue in multiple selves. According to branching identity, continuity of consciousness will continue in both the original brain and the upload after nondestructive uploading. Branching identity can also resolve long standing questions about split-brain syndrome and can provide clear predictions about identity in even the most difficult cases imagined by philosophers."
+    
+    
 //    private var nlViewModel = NaturalLanguageViewModel(doc1: "", doc2: "")
     
     /* TODO:
@@ -29,10 +39,17 @@ struct AutoLiteratureReviewView: View {
         VStack(alignment: .leading) {
             // TODO: we should use a viewmodel to search the library for supporting papers
             // TODO: controls to upload thesis here
-            Button(action: search) {
-                Image(systemName: "highlighter")
-                Text("Begin Auto-Literature Review")
-            }
+            
+            Text("Citation:")
+            Text(citation)
+            Divider()
+            Text("Thesis:")
+            Text(thesis)
+            
+//            Button(action: search) {
+//                Image(systemName: "highlighter")
+//                Text("Begin Auto-Literature Review")
+//            }
             
         }
         .navigationTitle("Auto-Literature Review")
@@ -40,17 +57,11 @@ struct AutoLiteratureReviewView: View {
             /* TODO: Remove all this temporary code
              
              For now I'll be testing the functionality of the natural language view model by testing it here.
+             Will need to make a dictionary or list of all the texts in the repository, so that we can search through everything to find the relevant papers.
             */
             
-            // From: DOI 10.1007/s11023-014-9352-8
-            var doc1 = "If a brain is uploaded into a computer, will consciousness continue in digital form or will it end forever when the brain is destroyed? Philosophers have long debated such dilemmas and classify them as questions about personal identity. There are currently three main theories of personal identity: biological, psycho- logical, and closest continuer theories. None of these theories can successfully address the questions posed by the possibility of uploading. I will argue that uploading requires us to adopt a new theory of identity, psychological branching identity. Psychological branching identity states that consciousness will continue as long as there is continuity in psychological structure. What differentiates this from psychological identity is that it allows identity to continue in multiple selves. According to branching identity, continuity of consciousness will continue in both the original brain and the upload after nondestructive uploading. Branching identity can also resolve long standing questions about split-brain syndrome and can provide clear predictions about identity in even the most difficult cases imagined by philosophers."
-            
-            
-            // From: http://dx.doi.org/10.1016/j.neunet.2016.11.003
-            var doc2 = "The hard problem of consciousness is the problem of explaining how we experience qualia or phenome- nal experiences, such as seeing, hearing, and feeling, and knowing what they are. To solve this problem, a theory of consciousness needs to link brain to mind by modeling how emergent properties of several brain mechanisms interacting together embody detailed properties of individual conscious psychologi- cal experiences. This article summarizes evidence that Adaptive Resonance Theory, or ART, accomplishes this goal. ART is a cognitive and neural theory of how advanced brains autonomously learn to attend, rec- ognize, and predict objects and events in a changing world. ART has predicted that ‘‘all conscious states are resonant states’’ as part of its specification of mechanistic links between processes of consciousness, learning, expectation, attention, resonance, and synchrony. It hereby provides functional and mechanistic explanations of data ranging from individual spikes and their synchronization to the dynamics of con- scious perceptual, cognitive, and cognitive–emotional experiences. ART has reached sufficient maturity to begin classifying the brain resonances that support conscious experiences of seeing, hearing, feeling, and knowing. Psychological and neurobiological data in both normal individuals and clinical patients are clarified by this classification. This analysis also explains why not all resonances become conscious, and why not all brain dynamics are resonant. The global organization of the brain into computationally com- plementary cortical processing streams (complementary computing), and the organization of the cerebral cortex into characteristic layers of cells (laminar computing), figure prominently in these explanations of conscious and unconscious processes. Alternative models of consciousness are also discussed."
-            
-            doc1 = doc1.replacingOccurrences(of: "- ", with: "")
-            doc2 = doc1.replacingOccurrences(of: "- ", with: "")
+            thesis = thesis.replacingOccurrences(of: "- ", with: "")
+            citation = citation.replacingOccurrences(of: "- ", with: "")
             
             let nlViewModel = NaturalLanguageViewModel()
             
@@ -69,9 +80,16 @@ struct AutoLiteratureReviewView: View {
             // TODO: Now we should be able to start making dictionaries of similarity and use the sentiment to roughly determine level of agreement
             // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
             
-            print(nlViewModel.citations(for: doc1, from: doc2))
-            print("\nKeywords Doc1: \(nlViewModel.keywords(for: doc1, top: 10))")
-            print("\nKeywords Doc2: \(nlViewModel.keywords(for: doc2))")
+            print(nlViewModel.citations(for: thesis, from: citation))
+            print("\nKeywords Thesis: \(nlViewModel.keywords(for: thesis))")
+            print("\nKeywords Citation: \(nlViewModel.keywords(for: citation))")
+            
+            
+            /* TODO:
+             We should start implementing the UI now. We can continue using the test data for now and implement this as the results screen.
+             We'll need to read from PDF soon however.
+             
+             */
             
         }
         
