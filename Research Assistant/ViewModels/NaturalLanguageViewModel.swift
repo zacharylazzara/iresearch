@@ -25,7 +25,7 @@ class NaturalLanguageViewModel {
         return sText
     }
     
-    func nearestArgs(for args: Array<Argument>, distanceThreshold: Double = 1.0) -> Array<Argument> {
+    func nearestArgs(for args: Array<Argument>, distanceThreshold: Double = 0.9) -> Array<Argument> {
         var nearestArgs: Array<Argument> = []
         args.forEach { arg in
             let nearestArg = arg.args.max(by: { c, _ in
@@ -42,7 +42,7 @@ class NaturalLanguageViewModel {
         return nearestArgs
     }
     
-    func citations(for doc1: String, from doc2: String, distanceThreshold: Double = 1.0, sentimentThreshold: Double = 0.3) -> Array<Argument> {
+    func citations(for doc1: String, from doc2: String, distanceThreshold: Double = 0.9) -> Array<Argument> {
         let sents1 = tokenize(text: doc1)
         let sents2 = tokenize(text: doc2)
         
@@ -54,10 +54,10 @@ class NaturalLanguageViewModel {
             sents2.forEach { sent2 in
                 let sentiment2 = sentiment(for: sent2)
                 let distance = distance(between: sent1, and: sent2)
-                let sentimentDifference = abs(sentiment1 - sentiment2) // TODO: make sure the math makes sense for this
+                let sentiment = sentiment1 * sentiment2
                 
-                if distance < distanceThreshold { // TODO: supporting should be null if sentiment is neutral?
-                    analysis.args.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: sentimentDifference < sentimentThreshold))
+                if distance < distanceThreshold {
+                    analysis.args.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: sentiment >= 0))
                 }
             }
             args.append(analysis)
