@@ -7,7 +7,6 @@
 
 import Foundation
 import NaturalLanguage
-//import CreateML
 
 class NaturalLanguageViewModel {
     private let language:NLLanguage
@@ -105,10 +104,10 @@ class NaturalLanguageViewModel {
         return Double(distance!.description)!
     }
     
-    func keywords(for doc: String, top n: Int = 10) -> ArraySlice<(String, Int)> { // Returns the top n words and their associated frequency
+    func keywords(for doc: String, top n: Int = 10) -> ArraySlice<(String, Int)> {
         var words = tokenize(text: doc, by: .word)
         
-        words.removeAll {word in
+        words.removeAll { word in
             stopwords.contains(word.lowercased())
         }
         
