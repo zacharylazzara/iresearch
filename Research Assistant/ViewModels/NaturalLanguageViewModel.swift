@@ -14,6 +14,8 @@ class NaturalLanguageViewModel {
     private let distanceThreshold: Double = 1.0
     private let sentimentThreshold: Double = 0.3 // This is a variance/difference (sentiment can only differ by the specified amount)
     
+    private let stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
+    
     public class Argument: CustomStringConvertible { // TODO: determine if this should be in its own file or not (I'm not sure what the best practice here is)
         public let sentence: String // TODO: string should throw an exception if it's ever empty
         public let sentiment: Double // TODO: enforce range [-1.0, 1.0]; if exceeded we should throw an exception
@@ -103,24 +105,21 @@ class NaturalLanguageViewModel {
         return Double(distance!.description)!
     }
     
-    func keywords(for doc: String) -> Array<(String, Int)> { // Returns the word + frequency
-        // TODO: we need to throw out stop words as well
+    func keywords(for doc: String, top n: Int = 5) -> ArraySlice<(String, Int)> { // Returns the word + frequency
+        var words = tokenize(text: doc, by: .word)
         
+        words.removeAll {word in
+            stopwords.contains(word.lowercased())
+        }
         
-        
-        let words = tokenize(text: doc, by: .word)
         let freq = words.reduce(into: [:]) { $0[$1, default: 0] += 1 } // From: https://stackoverflow.com/a/30545629/7653788
         
         var wFreq: Array<(String, Int)> = []
         freq.sorted{ return $0.value > $1.value }.forEach { f in
             wFreq.append((f.key, f.value))
-            
-            print(f)
         }
         
-        
-        
-        return wFreq
+        return wFreq.prefix(n)
     }
     
     
