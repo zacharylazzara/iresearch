@@ -36,6 +36,7 @@
 		B6A5101F267140C800827BE0 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5101E267140C800827BE0 /* AppGroup.swift */; };
 		B6A51020267140C800827BE0 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A5101E267140C800827BE0 /* AppGroup.swift */; };
 		B81B556B26B86FA200386357 /* NaturalLanguageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81B556A26B86FA200386357 /* NaturalLanguageViewModel.swift */; };
+		B81B556D26B9EC4B00386357 /* Argument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81B556C26B9EC4B00386357 /* Argument.swift */; };
 		B84E03112674193800F0817B /* Directory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84E03102674193800F0817B /* Directory.swift */; };
 		B84E03132674194200F0817B /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84E03122674194200F0817B /* Document.swift */; };
 		B84E0315267A49C400F0817B /* PreviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84E0314267A49C400F0817B /* PreviewController.swift */; };
@@ -117,6 +118,7 @@
 		B6A5101D26713FE300827BE0 /* Research Assistant.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Research Assistant.entitlements"; sourceTree = "<group>"; };
 		B6A5101E267140C800827BE0 /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
 		B81B556A26B86FA200386357 /* NaturalLanguageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NaturalLanguageViewModel.swift; sourceTree = "<group>"; };
+		B81B556C26B9EC4B00386357 /* Argument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Argument.swift; sourceTree = "<group>"; };
 		B84E03102674193800F0817B /* Directory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Directory.swift; sourceTree = "<group>"; };
 		B84E03122674194200F0817B /* Document.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Document.swift; sourceTree = "<group>"; };
 		B84E0314267A49C400F0817B /* PreviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewController.swift; sourceTree = "<group>"; };
@@ -259,6 +261,7 @@
 				B6A5101E267140C800827BE0 /* AppGroup.swift */,
 				B84E03102674193800F0817B /* Directory.swift */,
 				B84E03122674194200F0817B /* Document.swift */,
+				B81B556C26B9EC4B00386357 /* Argument.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -444,6 +447,7 @@
 				B84E03132674194200F0817B /* Document.swift in Sources */,
 				B6A50FBD266E8D2B00827BE0 /* Persistence.swift in Sources */,
 				B84E0319267A5DCC00F0817B /* FileView.swift in Sources */,
+				B81B556D26B9EC4B00386357 /* Argument.swift in Sources */,
 				B6A50FF82670EDFB00827BE0 /* NotesView.swift in Sources */,
 				B6A50FF2266FADCE00827BE0 /* FileType.swift in Sources */,
 				B6A50FF62670EDE500827BE0 /* CitationGeneratorView.swift in Sources */,

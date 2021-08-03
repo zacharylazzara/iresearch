@@ -13,36 +13,33 @@ class NaturalLanguageViewModel {
     private let artifacts = [("- ", "")] // Artifacts should be replaced by the associated feature; i.e., (artififact, replacement)
     private let stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
     
-    public class Argument: CustomStringConvertible { // TODO: determine if this should be in its own file or not (I'm not sure what the best practice here is)
-        public let sentence: String // TODO: string should throw an exception if it's ever empty
-        public let sentiment: Double // TODO: enforce range [-1.0, 1.0]; if exceeded we should throw an exception
-        public let distance: Double? // TODO: distance should throw an exception if it's ever set to negative
-        public let supporting: Bool?
-        
-        public var args: Array<Argument> = []
-        
-        init(sentence: String, sentiment: Double, distance: Double? = nil, supporting: Bool? = nil) {
-            self.sentence = sentence
-            self.sentiment = sentiment
-            self.distance = distance
-            self.supporting = supporting
-        }
-        
-        public var description: String {
-            return "\n\nSENTENCE: \(sentence), \nSENTIMENT: \(sentiment), \nDISTANCE: \(String(describing: distance ?? nil)), \nSUPPORTING: \(String(describing: supporting)), \nARGS: \(args)"
-        }
-    }
-    
     init(language: NLLanguage = .english) {
         self.language = language
     }
     
-    private func sanitize(text: String) -> String { // Any additional repairing/cleaning of the text should be done here
-        var sanitizedText: String = text
+    private func sanitize(text: String) -> String {
+        var sText: String = text
         artifacts.forEach { artifact in
-            sanitizedText = sanitizedText.replacingOccurrences(of: artifact.0, with: artifact.1)
+            sText = sText.replacingOccurrences(of: artifact.0, with: artifact.1)
         }
-        return sanitizedText
+        return sText
+    }
+    
+    func nearestArgs(for args: Array<Argument>, distanceThreshold: Double = 1.0) -> Array<Argument> {
+        var nearestArgs: Array<Argument> = []
+        args.forEach { arg in
+            let nearestArg = arg.args.max(by: { c, _ in
+                return c.distance! < distanceThreshold // TODO: redo this part, and follow from https://stackoverflow.com/questions/56916160/find-nearest-smaller-number-in-array
+            })
+            
+            arg.args = []
+            if nearestArg != nil {
+                arg.args.append(nearestArg!)
+            }
+            
+            nearestArgs.append(arg)
+        }
+        return nearestArgs
     }
     
     func citations(for doc1: String, from doc2: String, distanceThreshold: Double = 1.0, sentimentThreshold: Double = 0.3) -> Array<Argument> {
@@ -59,7 +56,7 @@ class NaturalLanguageViewModel {
                 let distance = distance(between: sent1, and: sent2)
                 let sentimentDifference = abs(sentiment1 - sentiment2) // TODO: make sure the math makes sense for this
                 
-                if distance < distanceThreshold {
+                if distance < distanceThreshold { // TODO: supporting should be null if sentiment is neutral?
                     analysis.args.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: sentimentDifference < sentimentThreshold))
                 }
             }

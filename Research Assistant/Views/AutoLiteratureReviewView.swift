@@ -16,6 +16,7 @@
 import SwiftUI
 
 struct AutoLiteratureReviewView: View {
+    private let nlViewModel = NaturalLanguageViewModel()
     @State private var link: String = "" // TODO: download from link somehow
     
     // From: http://dx.doi.org/10.1016/j.neunet.2016.11.003
@@ -25,6 +26,14 @@ struct AutoLiteratureReviewView: View {
     // From: DOI 10.1007/s11023-014-9352-8
     // Using this text for testing purposes for now.
     @State private var thesis: String = "If a brain is uploaded into a computer, will consciousness continue in digital form or will it end forever when the brain is destroyed? Philosophers have long debated such dilemmas and classify them as questions about personal identity. There are currently three main theories of personal identity: biological, psycho- logical, and closest continuer theories. None of these theories can successfully address the questions posed by the possibility of uploading. I will argue that uploading requires us to adopt a new theory of identity, psychological branching identity. Psychological branching identity states that consciousness will continue as long as there is continuity in psychological structure. What differentiates this from psychological identity is that it allows identity to continue in multiple selves. According to branching identity, continuity of consciousness will continue in both the original brain and the upload after nondestructive uploading. Branching identity can also resolve long standing questions about split-brain syndrome and can provide clear predictions about identity in even the most difficult cases imagined by philosophers."
+    
+//    @State private var tAttrStr: NSMutableAttributedString
+//    @State private var cAttrStr: NSMutableAttributedString
+    
+    //@State private var thesisTexts: Array<Text> = []
+    //@State private var tSentences: Array<String> = []
+    @State private var tArgs: Array<Argument> = []
+    @State private var cArgs: Array<Argument> = []
     
     
 //    private var nlViewModel = NaturalLanguageViewModel(doc1: "", doc2: "")
@@ -41,10 +50,38 @@ struct AutoLiteratureReviewView: View {
             // TODO: controls to upload thesis here
             
             Text("Citation:")
-            Text(citation)
+            ForEach(cArgs, id: \.self) { cArg in
+                if cArg.args.count > 0 {
+                    ForEach(cArg.args, id: \.self) { cArg in
+                        if cArg.supporting! {
+                            Text("\(cArg.sentence)").foregroundColor(.green)
+                        } else {
+                            Text("\(cArg.sentence)").foregroundColor(.red)
+                        }
+                    }
+                } else {
+                    Text("\(cArg.sentence)")
+                }
+            }
+            
             Divider()
+            
             Text("Thesis:")
-            Text(thesis)
+            ForEach(tArgs, id: \.self) { tArg in
+                if tArg.args.count > 0 {
+                    ForEach(tArg.args, id: \.self) { cArg in
+                        if cArg.supporting! {
+                            Text("\(tArg.sentence)").foregroundColor(.green)
+                        } else {
+                            Text("\(tArg.sentence)").foregroundColor(.red)
+                        }
+                    }
+                } else {
+                    Text("\(tArg.sentence)")
+                }
+            }
+            
+            // TODO: we'll need to build an attributed string based on the NLP results so that we can highlight relevant passages
             
 //            Button(action: search) {
 //                Image(systemName: "highlighter")
@@ -54,6 +91,10 @@ struct AutoLiteratureReviewView: View {
         }
         .navigationTitle("Auto-Literature Review")
         .onAppear() {
+            tArgs = nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+            cArgs = nlViewModel.nearestArgs(for: nlViewModel.citations(for: citation, from: thesis))
+            
+            
             /* TODO: Remove all this temporary code
              
              For now I'll be testing the functionality of the natural language view model by testing it here.
@@ -61,7 +102,7 @@ struct AutoLiteratureReviewView: View {
             */
             
             
-            let nlViewModel = NaturalLanguageViewModel()
+            
             
 //            let sents1 = nlViewModel.tokenize(text: doc1)
 //            let sents2 = nlViewModel.tokenize(text: doc2)
@@ -78,21 +119,17 @@ struct AutoLiteratureReviewView: View {
             // TODO: Now we should be able to start making dictionaries of similarity and use the sentiment to roughly determine level of agreement
             // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
             
-            print(nlViewModel.citations(for: thesis, from: citation))
+            //print(nlViewModel.citations(for: thesis, from: citation))
             print("\nKeywords Thesis: \(nlViewModel.keywords(for: thesis))")
             print("\nKeywords Citation: \(nlViewModel.keywords(for: citation))")
-            
-            
-            /* TODO:
-             We should start implementing the UI now. We can continue using the test data for now and implement this as the results screen.
-             We'll need to read from PDF soon however.
-             
-             */
-            
         }
         
         Spacer()
     }
+    
+    
+    
+    
     
     private func search() {
         /* TODO:
