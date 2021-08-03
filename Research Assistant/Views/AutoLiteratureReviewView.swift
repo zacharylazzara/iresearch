@@ -55,24 +55,19 @@ struct AutoLiteratureReviewView: View {
             let sents1 = nlViewModel.tokenize(text: doc1)
             let sents2 = nlViewModel.tokenize(text: doc2)
             
-            print("Sentiment Analysis:")
-            sents1.forEach { sent in
-                print(sent)
-                print("\(nlViewModel.sentimentAnalysis(for: sent))\n")
-            }
+//            print("\nNLP Testing:")
+//            let sep = "-----------------------------------"
+//            sents1.forEach { sent1 in
+//                print("\(sep)\n[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent1))]\n\(sent1)\n")
+//                sents2.forEach { sent2 in
+//                    print("\t[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent2)), Distance: \(nlViewModel.sentenceDistance(sent1: sent1, sent2: sent2))]\n\t\(sent2)\n")
+//                }
+//            }
             
-            print("Distance:")
-            sents1.forEach { sent1 in
-                print("---------\n\(sent1)")
-                sents2.forEach { sent2 in
-                    print("\n\tDistance: \(nlViewModel.sentenceSimialrity(sent1: sent1, sent2: sent2))")
-                    print("\t\(sent2)")
-                }
-            }
+            // TODO: Now we should be able to start making dictionaries of similarity and use the sentiment to roughly determine level of agreement
+            // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
             
-            
-            
-            
+            print(nlViewModel.argumentAnalysis(for: doc1, against: doc2))
             
         }
         
