@@ -48,9 +48,6 @@ struct AutoLiteratureReviewView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            // TODO: we should use a viewmodel to search the library for supporting papers
-            // TODO: controls to upload thesis here
-            
             VStack(alignment: .leading) {
                 ForEach(tArgs, id: \.self) { tArg in
                     HStack(alignment: .top) {
@@ -64,7 +61,7 @@ struct AutoLiteratureReviewView: View {
                         }
                     }
                     if tArg.args.count > 0{
-                        Divider() // TODO: having the divider here means it'll run often even when it shouldn't (we get multiple dividers on a single line with nothing between)
+                        Divider()
                     }
                 }
                 Text("Thesis Keywords:")
@@ -81,20 +78,11 @@ struct AutoLiteratureReviewView: View {
                     }
                 }
             }
-            
-            // TODO: we'll need to build an attributed string based on the NLP results so that we can highlight relevant passages
-            
-            //            Button(action: search) {
-            //                Image(systemName: "highlighter")
-            //                Text("Begin Auto-Literature Review")
-            //            }
-            
         }
         .navigationTitle("Auto-Literature Review")
         .onAppear() {
-            tArgs = nlViewModel.citations(for: thesis, from: citation)//nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
-            cArgs = nlViewModel.citations(for: citation, from: thesis)//nlViewModel.nearestArgs(for: nlViewModel.citations(for: citation, from: thesis))
-            
+            tArgs = nlViewModel.citations(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+            cArgs = nlViewModel.citations(for: citation, from: thesis) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: citation, from: thesis))
             
             /* TODO: Remove all this temporary code
              
