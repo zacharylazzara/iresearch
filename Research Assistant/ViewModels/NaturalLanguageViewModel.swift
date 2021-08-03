@@ -12,10 +12,11 @@ import NaturalLanguage
 class NaturalLanguageViewModel {
     private let language:NLLanguage
     
-    private var doc1: String
-    private var doc2: String
-    private var sents1: Array<String>?
-    private var sents2: Array<String>?
+    // TODO: make these private later
+    var doc1: String
+    var doc2: String
+//    var sents1: Array<String> = []
+//    var sents2: Array<String> = []
     
     private var sentDic: Dictionary<String, Array<String>>?
     // TODO: we might want the dictionary to contain more than just an array; it needs an array of tuples which includes
@@ -26,9 +27,8 @@ class NaturalLanguageViewModel {
         self.language = language
         self.doc1 = doc1
         self.doc2 = doc2
-        
-        sents1 = tokenize(text: doc1)
-        sents2 = tokenize(text: doc2)
+//        sents1 = tokenize(text: doc1)
+//        sents2 = tokenize(text: doc2)
     }
     
     func tokenize(text: String, unit: NLTokenUnit = .sentence) -> Array<String> {
@@ -37,7 +37,7 @@ class NaturalLanguageViewModel {
         
         var sentence: Array<String> = []
 
-        tokenizer.enumerateTokens(in: text.startIndex ..< text.endIndex) { tokenRange, _ in
+        tokenizer.enumerateTokens(in: text.startIndex..<text.endIndex) { tokenRange, _ in
             sentence.append(String(text[tokenRange])) // TODO: determine if this is the right way to get the value out of this enumeration
             return true
         }
@@ -45,40 +45,35 @@ class NaturalLanguageViewModel {
         return sentence
     }
     
-    func sentimentAnalysis(for text: String, unit: NLTokenUnit = .sentence) -> Double {
-        let tagger = NLTagger(tagSchemes: [.sentimentScore])
+    func sentimentAnalysis(for text: String, unit: NLTokenUnit = .sentence) -> String {
+        let tagger = NLTagger(tagSchemes: [.tokenType, .sentimentScore])
+        tagger.string = text
         
-        let string = text
-        tagger.string = string
+        var senScore:String?
         
-        let (sentiment, _) = tagger.tag(at: string.startIndex, unit: unit, scheme: .sentimentScore)
-        let value = sentiment?.rawValue ?? ""
+        tagger.enumerateTags(in: text.startIndex..<text.endIndex, unit: .paragraph,
+                             scheme: .sentimentScore, options: []) { sentiment, _ in
+            
+            if let sentimentScore = sentiment {
+                senScore = sentimentScore.rawValue
+            }
+            
+            return true
+        }
         
-        return (value as NSString).doubleValue
+        return senScore!
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-//
-//    func sentenceSimialrity(sent1: String, sent2: String) -> NLDistance {
-//        if let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: language) {
-////            if let vector = sentenceEmbedding.vector(for: sent1) {
-////                print (vector)
-////            }
-//
-//            let distance = sentenceEmbedding.distance(between: sent1, and: sent2)
-//            return distance//.description
-//        }
-//    }
+    func sentenceSimialrity(sent1: String, sent2: String) -> String {
+        var distance: NLDistance?
+        if let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: language) {
+//            if let vector = sentenceEmbedding.vector(for: sent1) {
+//                print (vector)
+//            }
+            distance = sentenceEmbedding.distance(between: sent1, and: sent2)
+        }
+        return distance!.description
+    }
 //    // TODO: we use the above function to determine how similar the sentences are; we can now start implementing what we have in the Python experimental code
 //
 //    // First step is to tokenize the input text into sentences
