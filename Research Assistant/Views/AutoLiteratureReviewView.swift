@@ -49,35 +49,43 @@ struct AutoLiteratureReviewView: View {
             // TODO: we should use a viewmodel to search the library for supporting papers
             // TODO: controls to upload thesis here
             
-            Text("Citation:")
-            ForEach(cArgs, id: \.self) { cArg in
-                if cArg.args.count > 0 {
-                    ForEach(cArg.args, id: \.self) { cArg in
-                        if cArg.supporting! {
-                            Text("\(cArg.sentence)").foregroundColor(.green)
-                        } else {
-                            Text("\(cArg.sentence)").foregroundColor(.red)
-                        }
-                    }
-                } else {
-                    Text("\(cArg.sentence)")
-                }
-            }
+//            Text("Citation:")
+//            ForEach(cArgs, id: \.self) { cArg in
+//                if cArg.args.count > 0 {
+//                    ForEach(cArg.args, id: \.self) { cArg in
+//                        if cArg.supporting! {
+//                            Text("\(cArg.sentence)").foregroundColor(.green)
+//                        } else {
+//                            Text("\(cArg.sentence)").foregroundColor(.red)
+//                        }
+//                    }
+//                } else {
+//                    Text("\(cArg.sentence)")
+//                }
+//            }
+//
+//            Divider()
             
+            //Text("Thesis:") // TODO: this should probably be a function, as this is a lot of duplicate code
             Divider()
-            
-            Text("Thesis:")
-            ForEach(tArgs, id: \.self) { tArg in
-                if tArg.args.count > 0 {
-                    ForEach(tArg.args, id: \.self) { cArg in
-                        if cArg.supporting! {
-                            Text("\(tArg.sentence)").foregroundColor(.green)
-                        } else {
-                            Text("\(tArg.sentence)").foregroundColor(.red)
+            VStack(alignment: .leading) {
+                ForEach(tArgs, id: \.self) { tArg in
+                    HStack(alignment: .top) {
+                        if tArg.args.count > 0 {
+                            ForEach(tArg.args, id: \.self) { cArg in
+                                Text("Thesis:")
+                                Text("\(tArg.sentence)").foregroundColor(.blue)
+                                Text("Citation:")
+                                Text("\(cArg.sentence)").foregroundColor(cArg.supporting! ? .green : .red)
+//                                Text("Supporting: \(cArg.supporting! ? "Yes" : "No")")
+                            }
                         }
+                        
+                        //                    else {
+                        //                        Text("\(tArg.sentence)")
+                        //                    }
                     }
-                } else {
-                    Text("\(tArg.sentence)")
+                    Divider()
                 }
             }
             
