@@ -105,34 +105,20 @@ class NaturalLanguageViewModel {
         return Double(distance!.description)!
     }
     
-    func keywords(for doc: String, top n: Int = 5) -> ArraySlice<(String, Int)> { // Returns the word + frequency
+    func keywords(for doc: String, top n: Int = 10) -> ArraySlice<(String, Int)> { // Returns the top n words and their associated frequency
         var words = tokenize(text: doc, by: .word)
         
         words.removeAll {word in
             stopwords.contains(word.lowercased())
         }
         
-        let freq = words.reduce(into: [:]) { $0[$1, default: 0] += 1 } // From: https://stackoverflow.com/a/30545629/7653788
+        let freqDic = words.reduce(into: [:]) { $0[$1, default: 0] += 1 } // From: https://stackoverflow.com/a/30545629/7653788
         
-        var wFreq: Array<(String, Int)> = []
-        freq.sorted{ return $0.value > $1.value }.forEach { f in
-            wFreq.append((f.key, f.value))
+        var freqArr: Array<(String, Int)> = []
+        freqDic.sorted{ return $0.value > $1.value }.forEach { freqTup in
+            freqArr.append((freqTup.key, freqTup.value))
         }
         
-        return wFreq.prefix(n)
+        return freqArr.prefix(n)
     }
-    
-    
-    
-    // TODO: we want to find the best keywords/search terms; we'll need to know the word frequency for this
-    
-    
-//    // TODO: we use the above function to determine how similar the sentences are; we can now start implementing what we have in the Python experimental code
-//
-//    // First step is to tokenize the input text into sentences
-//
-//
-//    // doc1 and 2 will be the text extracted from a PDF or other document; we will deal only in the actual text itself here and not the document at all
-//
-    
 }

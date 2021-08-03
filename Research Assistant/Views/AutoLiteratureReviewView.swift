@@ -70,7 +70,8 @@ struct AutoLiteratureReviewView: View {
             // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
             
             print(nlViewModel.argumentAnalysis(for: doc1, against: doc2))
-            print("\nKeywords: \(nlViewModel.keywords(for: doc1))")
+            print("\nKeywords Doc1: \(nlViewModel.keywords(for: doc1, top: 10))")
+            print("\nKeywords Doc2: \(nlViewModel.keywords(for: doc2))")
             
         }
         
