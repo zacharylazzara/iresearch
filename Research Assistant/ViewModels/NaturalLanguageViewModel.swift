@@ -40,18 +40,18 @@ class NaturalLanguageViewModel {
         self.language = language
     }
     
-    func argumentAnalysis(for doc1: String, against doc2: String) -> Array<Argument> {
+    func citations(for doc1: String, from doc2: String) -> Array<Argument> {
         let sents1 = tokenize(text: doc1)
         let sents2 = tokenize(text: doc2)
         
         var args: Array<Argument> = []
         
         sents1.forEach { sent1 in
-            let sentiment1 = sentimentAnalysis(for: sent1)
+            let sentiment1 = sentiment(for: sent1)
             let analysis = Argument(sentence: sent1, sentiment: sentiment1)
             sents2.forEach { sent2 in
-                let sentiment2 = sentimentAnalysis(for: sent2)
-                let distance = sentenceDistance(sent1: sent1, sent2: sent2)
+                let sentiment2 = sentiment(for: sent2)
+                let distance = distance(between: sent1, and: sent2)
                 let sentimentDifference = abs(sentiment1 - sentiment2) // TODO: make sure the math makes sense for this
                 
                 if distance < distanceThreshold {
@@ -78,7 +78,7 @@ class NaturalLanguageViewModel {
         return sentence
     }
     
-    func sentimentAnalysis(for text: String, unit: NLTokenUnit = .sentence) -> Double {
+    func sentiment(for text: String, by unit: NLTokenUnit = .sentence) -> Double {
         let tagger = NLTagger(tagSchemes: [.tokenType, .sentimentScore])
         tagger.string = text
         
@@ -97,7 +97,7 @@ class NaturalLanguageViewModel {
         return senScore!
     }
     
-    func sentenceDistance(sent1: String, sent2: String) -> Double {
+    func distance(between sent1: String, and sent2: String) -> Double {
         var distance: NLDistance?
         if let sentenceEmbedding = NLEmbedding.sentenceEmbedding(for: language) {
             distance = sentenceEmbedding.distance(between: sent1, and: sent2, distanceType: .cosine)

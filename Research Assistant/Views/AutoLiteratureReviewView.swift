@@ -69,7 +69,7 @@ struct AutoLiteratureReviewView: View {
             // TODO: Now we should be able to start making dictionaries of similarity and use the sentiment to roughly determine level of agreement
             // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
             
-            print(nlViewModel.argumentAnalysis(for: doc1, against: doc2))
+            print(nlViewModel.citations(for: doc1, from: doc2))
             print("\nKeywords Doc1: \(nlViewModel.keywords(for: doc1, top: 10))")
             print("\nKeywords Doc2: \(nlViewModel.keywords(for: doc2))")
             
