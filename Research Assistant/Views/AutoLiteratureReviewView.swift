@@ -27,16 +27,18 @@ struct AutoLiteratureReviewView: View {
     // Using this text for testing purposes for now.
     @State private var thesis: String = "If a brain is uploaded into a computer, will consciousness continue in digital form or will it end forever when the brain is destroyed? Philosophers have long debated such dilemmas and classify them as questions about personal identity. There are currently three main theories of personal identity: biological, psycho- logical, and closest continuer theories. None of these theories can successfully address the questions posed by the possibility of uploading. I will argue that uploading requires us to adopt a new theory of identity, psychological branching identity. Psychological branching identity states that consciousness will continue as long as there is continuity in psychological structure. What differentiates this from psychological identity is that it allows identity to continue in multiple selves. According to branching identity, continuity of consciousness will continue in both the original brain and the upload after nondestructive uploading. Branching identity can also resolve long standing questions about split-brain syndrome and can provide clear predictions about identity in even the most difficult cases imagined by philosophers."
     
-//    @State private var tAttrStr: NSMutableAttributedString
-//    @State private var cAttrStr: NSMutableAttributedString
+    //    @State private var tAttrStr: NSMutableAttributedString
+    //    @State private var cAttrStr: NSMutableAttributedString
     
     //@State private var thesisTexts: Array<Text> = []
     //@State private var tSentences: Array<String> = []
     @State private var tArgs: Array<Argument> = []
     @State private var cArgs: Array<Argument> = []
+    @State private var tKeywords: Array<String> = []
+    @State private var cKeywords: Array<String> = []
     
     
-//    private var nlViewModel = NaturalLanguageViewModel(doc1: "", doc2: "")
+    //    private var nlViewModel = NaturalLanguageViewModel(doc1: "", doc2: "")
     
     /* TODO:
      We're gonna want to utilize the share menu so we can easily send documents to the app; perhaps we shouldn't even offer the link download option under Import?
@@ -49,89 +51,86 @@ struct AutoLiteratureReviewView: View {
             // TODO: we should use a viewmodel to search the library for supporting papers
             // TODO: controls to upload thesis here
             
-//            Text("Citation:")
-//            ForEach(cArgs, id: \.self) { cArg in
-//                if cArg.args.count > 0 {
-//                    ForEach(cArg.args, id: \.self) { cArg in
-//                        if cArg.supporting! {
-//                            Text("\(cArg.sentence)").foregroundColor(.green)
-//                        } else {
-//                            Text("\(cArg.sentence)").foregroundColor(.red)
-//                        }
-//                    }
-//                } else {
-//                    Text("\(cArg.sentence)")
-//                }
-//            }
-//
-//            Divider()
-            
-            //Text("Thesis:") // TODO: this should probably be a function, as this is a lot of duplicate code
-            Divider()
             VStack(alignment: .leading) {
                 ForEach(tArgs, id: \.self) { tArg in
                     HStack(alignment: .top) {
                         if tArg.args.count > 0 {
+                            Text("Thesis:")
+                            Text("\(tArg.sentence)").foregroundColor(.blue)
                             ForEach(tArg.args, id: \.self) { cArg in
-                                Text("Thesis:")
-                                Text("\(tArg.sentence)").foregroundColor(.blue)
                                 Text("Citation:")
                                 Text("\(cArg.sentence)").foregroundColor(cArg.supporting! ? .green : .red)
-//                                Text("Supporting: \(cArg.supporting! ? "Yes" : "No")")
                             }
                         }
-                        
-                        //                    else {
-                        //                        Text("\(tArg.sentence)")
-                        //                    }
                     }
-                    Divider()
+                    if tArg.args.count > 0{
+                        Divider() // TODO: having the divider here means it'll run often even when it shouldn't (we get multiple dividers on a single line with nothing between)
+                    }
+                }
+                Text("Thesis Keywords:")
+                HStack {
+                    ForEach(tKeywords, id: \.self) { keyword in
+                        Text("\(keyword)")
+                    }
+                }
+                Divider()
+                Text("Citation Keywords:")
+                HStack {
+                    ForEach(cKeywords, id: \.self) { keyword in
+                        Text("\(keyword)")
+                    }
                 }
             }
             
             // TODO: we'll need to build an attributed string based on the NLP results so that we can highlight relevant passages
             
-//            Button(action: search) {
-//                Image(systemName: "highlighter")
-//                Text("Begin Auto-Literature Review")
-//            }
+            //            Button(action: search) {
+            //                Image(systemName: "highlighter")
+            //                Text("Begin Auto-Literature Review")
+            //            }
             
         }
         .navigationTitle("Auto-Literature Review")
         .onAppear() {
-            tArgs = nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
-            cArgs = nlViewModel.nearestArgs(for: nlViewModel.citations(for: citation, from: thesis))
+            tArgs = nlViewModel.citations(for: thesis, from: citation)//nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+            cArgs = nlViewModel.citations(for: citation, from: thesis)//nlViewModel.nearestArgs(for: nlViewModel.citations(for: citation, from: thesis))
             
             
             /* TODO: Remove all this temporary code
              
              For now I'll be testing the functionality of the natural language view model by testing it here.
              Will need to make a dictionary or list of all the texts in the repository, so that we can search through everything to find the relevant papers.
-            */
+             */
             
             
             
             
-//            let sents1 = nlViewModel.tokenize(text: doc1)
-//            let sents2 = nlViewModel.tokenize(text: doc2)
+            //            let sents1 = nlViewModel.tokenize(text: doc1)
+            //            let sents2 = nlViewModel.tokenize(text: doc2)
             
-//            print("\nNLP Testing:")
-//            let sep = "-----------------------------------"
-//            sents1.forEach { sent1 in
-//                print("\(sep)\n[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent1))]\n\(sent1)\n")
-//                sents2.forEach { sent2 in
-//                    print("\t[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent2)), Distance: \(nlViewModel.sentenceDistance(sent1: sent1, sent2: sent2))]\n\t\(sent2)\n")
-//                }
-//            }
+            //            print("\nNLP Testing:")
+            //            let sep = "-----------------------------------"
+            //            sents1.forEach { sent1 in
+            //                print("\(sep)\n[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent1))]\n\(sent1)\n")
+            //                sents2.forEach { sent2 in
+            //                    print("\t[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent2)), Distance: \(nlViewModel.sentenceDistance(sent1: sent1, sent2: sent2))]\n\t\(sent2)\n")
+            //                }
+            //            }
             
             // TODO: Now we should be able to start making dictionaries of similarity and use the sentiment to roughly determine level of agreement
             // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
             
             //print(nlViewModel.citations(for: thesis, from: citation))
-            print("\nKeywords Thesis: \(nlViewModel.keywords(for: thesis))")
-            print("\nKeywords Citation: \(nlViewModel.keywords(for: citation))")
+            print("\nThesis Keywords: \(nlViewModel.keywords(for: thesis))")
+            print("\nCitation Keywords: \(nlViewModel.keywords(for: citation))")
+            
+            nlViewModel.keywords(for: thesis).forEach { keyword in
+                tKeywords.append(keyword.0)
+            }
+            nlViewModel.keywords(for: citation).forEach { keyword in
+                cKeywords.append(keyword.0)
+            }
         }
-        
         Spacer()
     }
     
