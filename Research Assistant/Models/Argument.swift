@@ -36,7 +36,7 @@ public class Argument: CustomStringConvertible, Hashable {
     }
     
     public var info: String {
-        return "\(sentence)\n\n-Quote Information-\nSentiment: \(sentiment == 0 ? "Neutral" : sentiment > 0 ? "Positive" : "Negative")\nRelevance: \(distance! < 0.5 ? "High" : distance! < 1 ? "Medium" : "Low")\nSupporting: \(supporting! ? "Yes" : "No")"
+        return "\(sentence)\n\n-Quote Information-\nSentiment:\t\t\(sentiment == 0 ? "Neutral" : sentiment > 0 ? "Positive" : "Negative")\nRelevance:\t\t\(distance! < 0.5 ? "High" : distance! < 1 ? "Medium" : "Low")\nSupporting:\t\(supporting! ? "Yes" : "No")"
     }
     // TODO: We'll need to provide page number and perhaps sentence number too at some point, so we should figure out how to add that into our argument data.
 }
