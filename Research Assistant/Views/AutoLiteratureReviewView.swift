@@ -78,7 +78,7 @@ struct AutoLiteratureReviewView: View {
                     }
                     HStack(alignment: .center) {
                         Spacer()
-                        if nlVM.percent <= 0 {
+                        if nlVM.compareProgress <= 0 {
                             Button(action: { analyse() }) {
                                 Text("\(Image(systemName: "doc.text.magnifyingglass")) Begin Analysis")
                             }
@@ -114,7 +114,7 @@ struct AutoLiteratureReviewView: View {
     private func analyse() {
         let docs = loadDocs()
         //thesis =
-        //citation = docs[0]
+        citation = docs[0]
         
         
         nlVM.citations(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
