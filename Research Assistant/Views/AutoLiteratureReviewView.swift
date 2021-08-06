@@ -14,8 +14,10 @@
  */
 
 import SwiftUI
+import PDFKit
 
 struct AutoLiteratureReviewView: View {
+    @EnvironmentObject var dirVM: DirectoryViewModel
     private let nlViewModel = NaturalLanguageViewModel()
     @State private var link: String = "" // TODO: download from link somehow
     
@@ -33,7 +35,7 @@ struct AutoLiteratureReviewView: View {
     //@State private var thesisTexts: Array<Text> = []
     //@State private var tSentences: Array<String> = []
     @State private var tArgs: Array<Argument> = []
-    @State private var cArgs: Array<Argument> = []
+    //@State private var cArgs: Array<Argument> = []
     @State private var tKeywords: Array<String> = []
     @State private var cKeywords: Array<String> = []
     
@@ -48,6 +50,21 @@ struct AutoLiteratureReviewView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
+            
+            
+            Button(action: { analyse() }) {
+                Text("\(Image(systemName: "doc.text.magnifyingglass")) Begin Analysis")
+            }
+            /* TODO:
+             This view will need to be a list view allowing the user to compare a number of documents. The most relevant document can be put at the top of the list.
+             Documents in the list should display a relevance score, this will be based on keywords.
+             
+             Rather than searching through all documents at first, we can allow the user to select specific documents to search, or search all. We will determine the initial relevancy based on keyword matching. When matching keywords we must take into account the nearest neighbours of each word (words with similar meanings should be included in the matching process, but perhaps with slightly less weight than directly matching words).
+             */
+            
+            Divider()
+            
+            
             VStack(alignment: .leading) {
                 ForEach(tArgs, id: \.self) { tArg in
                     HStack(alignment: .top) {
@@ -80,51 +97,94 @@ struct AutoLiteratureReviewView: View {
             }
         }
         .navigationTitle("Auto-Literature Review")
-        .onAppear() {
-            tArgs = nlViewModel.citations(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
-            cArgs = nlViewModel.citations(for: citation, from: thesis) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: citation, from: thesis))
-            
-            /* TODO: Remove all this temporary code
-             
-             For now I'll be testing the functionality of the natural language view model by testing it here.
-             Will need to make a dictionary or list of all the texts in the repository, so that we can search through everything to find the relevant papers.
-             */
-            
-            
-            
-            
-            //            let sents1 = nlViewModel.tokenize(text: doc1)
-            //            let sents2 = nlViewModel.tokenize(text: doc2)
-            
-            //            print("\nNLP Testing:")
-            //            let sep = "-----------------------------------"
-            //            sents1.forEach { sent1 in
-            //                print("\(sep)\n[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent1))]\n\(sent1)\n")
-            //                sents2.forEach { sent2 in
-            //                    print("\t[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent2)), Distance: \(nlViewModel.sentenceDistance(sent1: sent1, sent2: sent2))]\n\t\(sent2)\n")
-            //                }
-            //            }
-            
-            // TODO: Now we should be able to start making dictionaries of similarity and use the sentiment to roughly determine level of agreement
-            // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
-            
-            //print(nlViewModel.citations(for: thesis, from: citation))
-            print("\nThesis Keywords: \(nlViewModel.keywords(for: thesis))")
-            print("\nCitation Keywords: \(nlViewModel.keywords(for: citation))")
-            
-            nlViewModel.keywords(for: thesis).forEach { keyword in
-                tKeywords.append(keyword.0)
-            }
-            nlViewModel.keywords(for: citation).forEach { keyword in
-                cKeywords.append(keyword.0)
-            }
-        }
         Spacer()
     }
     
     
+    /* TODO:
+     We need to scan through all directories within the library, and pull all relevant papers. Perhaps we can match keywords to determine relevance before we commit further computer resources.
+     The thesis should be uploaded from outside the app. A file picker should show up allowing the user to select their thesis PDF.
+     */
     
+    private func analyse() {
+        let docs = loadDocs()
+        //citation = docs[0]
+        
+        
+        tArgs = nlViewModel.citations(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+        //cArgs = nlViewModel.citations(for: citation, from: thesis) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: citation, from: thesis))
+        
+        /* TODO: Remove all this temporary code
+         
+         For now I'll be testing the functionality of the natural language view model by testing it here.
+         Will need to make a dictionary or list of all the texts in the repository, so that we can search through everything to find the relevant papers.
+         */
+        
+        
+        
+        
+        //            let sents1 = nlViewModel.tokenize(text: doc1)
+        //            let sents2 = nlViewModel.tokenize(text: doc2)
+        
+        //            print("\nNLP Testing:")
+        //            let sep = "-----------------------------------"
+        //            sents1.forEach { sent1 in
+        //                print("\(sep)\n[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent1))]\n\(sent1)\n")
+        //                sents2.forEach { sent2 in
+        //                    print("\t[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent2)), Distance: \(nlViewModel.sentenceDistance(sent1: sent1, sent2: sent2))]\n\t\(sent2)\n")
+        //                }
+        //            }
+        
+        // TODO: Now we should be able to start making dictionaries of similarity and use the sentiment to roughly determine level of agreement
+        // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
+        
+        //print(nlViewModel.citations(for: thesis, from: citation))
+        print("\nThesis Keywords: \(nlViewModel.keywords(for: thesis))")
+        print("\nCitation Keywords: \(nlViewModel.keywords(for: citation))")
+        
+        nlViewModel.keywords(for: thesis).forEach { keyword in
+            tKeywords.append(keyword.0)
+        }
+        nlViewModel.keywords(for: citation).forEach { keyword in
+            cKeywords.append(keyword.0)
+        }
+    }
     
+    private func loadDocs() -> [String] {
+        var documents: Array<String> = []
+        dirVM.loadDir().forEach { file in
+            if !file.isHidden() || dirVM.showHidden {
+                if let dir = file as? Directory {
+                    // File is a directory
+                    // TODO: we'll want to navigate through and load all subdirectories as well
+                    
+//                    Button(action: { changeDir(dir: dir) }) {
+//                        Text("\(Image(systemName: "folder")) \(file.name)")
+//                    }
+                } else {
+                    // File is not a directory
+                    
+                    // TODO: we should make sure the file type is a supported type (in this case a pdf)
+                    
+                    
+                    // Adapted from: https://www.hackingwithswift.com/example-code/libraries/how-to-extract-text-from-a-pdf-using-pdfkit
+                    if let pdf = PDFDocument(url: file.url) {
+                        let pageCount = pdf.pageCount
+                        let documentContent = NSMutableAttributedString()
+
+                        for i in 0 ..< pageCount {
+                            guard let page = pdf.page(at: i) else { continue }
+                            guard let pageContent = page.attributedString else { continue }
+                            documentContent.append(pageContent)
+                        }
+                        documents.append(documentContent.string)
+                    }
+                }
+            }
+        }
+        return documents
+    }
+
     
     private func search() {
         /* TODO:
