@@ -13,8 +13,15 @@ class NaturalLanguageViewModel {
     private let artifacts = [("- ", "")] // Artifacts should be replaced by the associated feature; i.e., (artififact, replacement)
     private let stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
     
+    @Published public var percent: Int // Percentage of how far along the current process in this view model is
+    @Published public var totalCompares: Int
+    @Published public var compareProgress: Int
+    
     init(language: NLLanguage = .english) {
         self.language = language
+        self.percent = 0
+        self.totalCompares = 0
+        self.compareProgress = 0
     }
     
     private func sanitize(text: String) -> String {
@@ -48,6 +55,10 @@ class NaturalLanguageViewModel {
         
         var args: Array<Argument> = []
         
+        totalCompares = sents1.count * sents2.count
+        compareProgress = 0
+        percent = 0
+        
         sents1.forEach { sent1 in
             let sentiment1 = sentiment(for: sent1)
             let analysis = Argument(sentence: sent1, sentiment: sentiment1)
@@ -59,6 +70,10 @@ class NaturalLanguageViewModel {
                 if distance < distanceThreshold {
                     analysis.args.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: sentiment >= 0))
                 }
+                
+                compareProgress += 1
+                percent = Int(Double(compareProgress) / Double(totalCompares) * 100.0)
+                print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(totalCompares))")
             }
             args.append(analysis)
         }

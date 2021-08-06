@@ -59,8 +59,9 @@ struct AutoLiteratureReviewView: View {
              This view will need to be a list view allowing the user to compare a number of documents. The most relevant document can be put at the top of the list.
              Documents in the list should display a relevance score, this will be based on keywords.
              
-             Rather than searching through all documents at first, we can allow the user to select specific documents to search, or search all. We will determine the initial relevancy based on keyword matching. When matching keywords we must take into account the nearest neighbours of each word (words with similar meanings should be included in the matching process, but perhaps with slightly less weight than directly matching words).
+             Rather than searching through all documents at first, we can allow the user to select specific documents to search, or search all. We will determine the initial relevancy based on keyword matching. When matching keywords we must take into account the nearest neighbours of each word (words with similar meanings should be included in the matching process, but perhaps with slightly less weight than directly matching words). We may also want to compare abstracts before comparing full documents, as comparing the full document can take a very long time.
              */
+            Text("Analysis Progress: \(nlViewModel.percent)% (\(nlViewModel.compareProgress)/\(nlViewModel.totalCompares))")
             
             Divider()
             
