@@ -35,7 +35,7 @@ public class Argument: CustomStringConvertible, Hashable {
         return "\n\nSENTENCE: \(sentence), \nSENTIMENT: \(sentiment), \nDISTANCE: \(String(describing: distance ?? nil)), \nSUPPORTING: \(String(describing: supporting)), \nARGS: \(args)"
     }
     
-    public var info: String {
+    public var info: String { // TODO: we can probably remove this; it's more or less just a duplicate of the above
         if distance == nil || supporting == nil {
             return "\(sentence)\n\nSentiment: \(sentiment == 0 ? "Neutral" : sentiment > 0 ? "Positive" : "Negative")"
         } else {

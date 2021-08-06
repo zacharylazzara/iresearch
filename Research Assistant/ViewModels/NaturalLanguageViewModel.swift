@@ -15,6 +15,7 @@ class NaturalLanguageViewModel: ObservableObject {
     
     // TODO: Need to keep most of these functions off the main thread, as we may sometimes be working with a ton of data
     
+    @Published public var progress: Double
     @Published public var percent: Int
     @Published public var totalCompares: Int
     @Published public var compareProgress: Int
@@ -23,6 +24,7 @@ class NaturalLanguageViewModel: ObservableObject {
     
     init(language: NLLanguage = .english) {
         self.language = language
+        self.progress = 0.0
         self.percent = 0
         self.totalCompares = 0
         self.compareProgress = 0
@@ -82,7 +84,8 @@ class NaturalLanguageViewModel: ObservableObject {
                         
                         DispatchQueue.main.async {
                             compareProgress += 1
-                            percent = Int(Double(compareProgress) / Double(totalCompares) * 100.0)
+                            progress = Double(compareProgress) / Double(totalCompares)
+                            percent = Int(progress * 100)
                         }
                         
                         print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(totalCompares))")

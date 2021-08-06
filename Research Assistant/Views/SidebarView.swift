@@ -11,6 +11,10 @@ struct SidebarView: View {
     @State private var selection: Int? = 1
     @State private var title: String = "Home"
     
+    
+    // TODO: For some reason the first view doesn't load unless we open the sidebar. This isn't an issue in landscape, but in portrait mode it is an issue
+    
+    
     var body: some View {
         List {
             Group {
