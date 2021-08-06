@@ -207,7 +207,7 @@ struct cArgView: View {
                 Color.red.frame(width: cgfWidth)
             }
             
-            Text("\(cArg.info)\n")
+            Text("\(cArg.info)")
             Spacer()
         }
     }
