@@ -8,7 +8,7 @@
 import Foundation
 import NaturalLanguage
 
-class NaturalLanguageViewModel {
+class NaturalLanguageViewModel: ObservableObject {
     private let language:NLLanguage
     private let artifacts = [("- ", "")] // Artifacts should be replaced by the associated feature; i.e., (artififact, replacement)
     private let stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
@@ -16,6 +16,7 @@ class NaturalLanguageViewModel {
     @Published public var percent: Int // Percentage of how far along the current process in this view model is
     @Published public var totalCompares: Int
     @Published public var compareProgress: Int
+    @Published public var args: Array<Argument> = []
     
     init(language: NLLanguage = .english) {
         self.language = language
@@ -49,37 +50,130 @@ class NaturalLanguageViewModel {
         return nearestArgs
     }
     
-    func citations(for doc1: String, from doc2: String, distanceThreshold: Double = 0.9) -> Array<Argument> {
+    func citations(for doc1: String, from doc2: String, distanceThreshold: Double = 0.9) {
         let sents1 = tokenize(text: doc1)
         let sents2 = tokenize(text: doc2)
         
-        var args: Array<Argument> = []
+        //var args: Array<Argument> = []
         
         totalCompares = sents1.count * sents2.count
         compareProgress = 0
         percent = 0
         
-        sents1.forEach { sent1 in
-            let sentiment1 = sentiment(for: sent1)
-            let analysis = Argument(sentence: sent1, sentiment: sentiment1)
-            sents2.forEach { sent2 in
-                let sentiment2 = sentiment(for: sent2)
-                let distance = distance(between: sent1, and: sent2)
-                let sentiment = sentiment1 * sentiment2
-                
-                if distance < distanceThreshold {
-                    analysis.args.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: sentiment >= 0))
+        let group = DispatchGroup()
+        let queue = DispatchQueue(label: "dev.lazzara.iresearch")
+        
+        let workItem = DispatchWorkItem { [self] in
+            sents1.forEach { sent1 in
+                queue.async(group: group) {
+                    print("Analyzing Sentence: \(sent1)")
+                    
+                    let sentiment1 = sentiment(for: sent1)
+                    let analysis = Argument(sentence: sent1, sentiment: sentiment1)
+                    sents2.forEach { sent2 in
+                        let sentiment2 = sentiment(for: sent2)
+                        let distance = distance(between: sent1, and: sent2)
+                        let sentiment = sentiment1 * sentiment2
+                        
+                        if distance < distanceThreshold {
+                            analysis.args.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: sentiment >= 0))
+                        }
+                        
+                        DispatchQueue.main.async {
+                            compareProgress += 1
+                            percent = Int(Double(compareProgress) / Double(totalCompares) * 100.0)
+                        }
+                        
+                        print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(totalCompares))")
+                    }
+                    
+                    DispatchQueue.main.async {
+                        args.append(analysis)
+                    }
+                    
+                    print("\nFinished Analyzing Sentence: \(sent1)\n")
                 }
-                
-                compareProgress += 1
-                percent = Int(Double(compareProgress) / Double(totalCompares) * 100.0)
-                print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(totalCompares))")
             }
-            args.append(analysis)
         }
         
-        return args
+        DispatchQueue.global().async(group: group, execute: workItem)
+
+        // you can block your current queue and wait until the group is ready
+        // a better way is to use a notification block instead of blocking
+        //group.wait(timeout: .now() + .seconds(3))
+        //print("done")
+
+        group.notify(queue: .main) { [self] in
+            print("Document Analysis Complete:\n\(args)")
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+//        DispatchQueue.concurrentPerform(iterations: sents1.count) { (i) in
+//
+//
+//            let sent1 = sents1[i]
+//            let sentiment1 = sentiment(for: sent1)
+//            let analysis = Argument(sentence: sent1, sentiment: sentiment1)
+//
+//            sents2.forEach { sent2 in
+//                let sentiment2 = sentiment(for: sent2)
+//                let distance = distance(between: sent1, and: sent2)
+//                let sentiment = sentiment1 * sentiment2
+//
+//                if distance < distanceThreshold {
+//                    analysis.args.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: sentiment >= 0))
+//                }
+//
+//                compareProgress += 1
+//                percent = Int(Double(compareProgress) / Double(totalCompares) * 100.0)
+//                print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(totalCompares))")
+//            }
+//            args.append(analysis)
+//        }
+        
+        
+//        DispatchQueue.global().sync { [self] in
+//            sents1.forEach { sent1 in
+//                let sentiment1 = sentiment(for: sent1)
+//                let analysis = Argument(sentence: sent1, sentiment: sentiment1)
+//                sents2.forEach { sent2 in
+//                    let sentiment2 = sentiment(for: sent2)
+//                    let distance = distance(between: sent1, and: sent2)
+//                    let sentiment = sentiment1 * sentiment2
+//
+//                    if distance < distanceThreshold {
+//                        analysis.args.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: sentiment >= 0))
+//                    }
+//
+//                    compareProgress += 1
+//                    percent = Int(Double(compareProgress) / Double(totalCompares) * 100.0)
+//                    print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(totalCompares))")
+//                }
+//                args.append(analysis)
+//            }
+//
+//
+//        }
+        
+        
+        
     }
+    
+    
+    
+    
+    
+    
+    
     
     func tokenize(text: String, by unit: NLTokenUnit = .sentence) -> Array<String> {
         let sText = sanitize(text: text)

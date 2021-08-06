@@ -18,7 +18,7 @@ import PDFKit
 
 struct AutoLiteratureReviewView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
-    private let nlViewModel = NaturalLanguageViewModel()
+    @EnvironmentObject var nlVM: NaturalLanguageViewModel
     @State private var link: String = "" // TODO: download from link somehow
     
     // From: http://dx.doi.org/10.1016/j.neunet.2016.11.003
@@ -29,13 +29,6 @@ struct AutoLiteratureReviewView: View {
     // Using this text for testing purposes for now.
     @State private var thesis: String = "If a brain is uploaded into a computer, will consciousness continue in digital form or will it end forever when the brain is destroyed? Philosophers have long debated such dilemmas and classify them as questions about personal identity. There are currently three main theories of personal identity: biological, psycho- logical, and closest continuer theories. None of these theories can successfully address the questions posed by the possibility of uploading. I will argue that uploading requires us to adopt a new theory of identity, psychological branching identity. Psychological branching identity states that consciousness will continue as long as there is continuity in psychological structure. What differentiates this from psychological identity is that it allows identity to continue in multiple selves. According to branching identity, continuity of consciousness will continue in both the original brain and the upload after nondestructive uploading. Branching identity can also resolve long standing questions about split-brain syndrome and can provide clear predictions about identity in even the most difficult cases imagined by philosophers."
     
-    //    @State private var tAttrStr: NSMutableAttributedString
-    //    @State private var cAttrStr: NSMutableAttributedString
-    
-    //@State private var thesisTexts: Array<Text> = []
-    //@State private var tSentences: Array<String> = []
-    @State private var tArgs: Array<Argument> = []
-    //@State private var cArgs: Array<Argument> = []
     @State private var tKeywords: Array<String> = []
     @State private var cKeywords: Array<String> = []
     
@@ -61,13 +54,13 @@ struct AutoLiteratureReviewView: View {
              
              Rather than searching through all documents at first, we can allow the user to select specific documents to search, or search all. We will determine the initial relevancy based on keyword matching. When matching keywords we must take into account the nearest neighbours of each word (words with similar meanings should be included in the matching process, but perhaps with slightly less weight than directly matching words). We may also want to compare abstracts before comparing full documents, as comparing the full document can take a very long time.
              */
-            Text("Analysis Progress: \(nlViewModel.percent)% (\(nlViewModel.compareProgress)/\(nlViewModel.totalCompares))")
+            Text("Analysis Progress: \(nlVM.percent)% (\(nlVM.compareProgress)/\(nlVM.totalCompares))")
             
             Divider()
             
             
             VStack(alignment: .leading) {
-                ForEach(tArgs, id: \.self) { tArg in
+                ForEach(nlVM.args, id: \.self) { tArg in
                     HStack(alignment: .top) {
                         if tArg.args.count > 0 {
                             Text("Thesis:")
@@ -110,9 +103,12 @@ struct AutoLiteratureReviewView: View {
     private func analyse() {
         let docs = loadDocs()
         //citation = docs[0]
+        nlVM.citations(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
         
         
-        tArgs = nlViewModel.citations(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+        
+        
+        //tArgs = nlViewModel.args
         //cArgs = nlViewModel.citations(for: citation, from: thesis) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: citation, from: thesis))
         
         /* TODO: Remove all this temporary code
@@ -140,13 +136,13 @@ struct AutoLiteratureReviewView: View {
         // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
         
         //print(nlViewModel.citations(for: thesis, from: citation))
-        print("\nThesis Keywords: \(nlViewModel.keywords(for: thesis))")
-        print("\nCitation Keywords: \(nlViewModel.keywords(for: citation))")
+        print("\nThesis Keywords: \(nlVM.keywords(for: thesis))")
+        print("\nCitation Keywords: \(nlVM.keywords(for: citation))")
         
-        nlViewModel.keywords(for: thesis).forEach { keyword in
+        nlVM.keywords(for: thesis).forEach { keyword in
             tKeywords.append(keyword.0)
         }
-        nlViewModel.keywords(for: citation).forEach { keyword in
+        nlVM.keywords(for: citation).forEach { keyword in
             cKeywords.append(keyword.0)
         }
     }
