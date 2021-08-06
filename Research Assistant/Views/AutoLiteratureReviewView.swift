@@ -20,6 +20,7 @@ struct AutoLiteratureReviewView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
     @EnvironmentObject var nlVM: NaturalLanguageViewModel
     @State private var link: String = "" // TODO: download from link somehow
+    private let cgfWidth: CGFloat = 5
     
     // From: http://dx.doi.org/10.1016/j.neunet.2016.11.003
     // Using this text for testing purposes for now.
@@ -43,8 +44,6 @@ struct AutoLiteratureReviewView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            
-            
             Button(action: { analyse() }) {
                 Text("\(Image(systemName: "doc.text.magnifyingglass")) Begin Analysis")
             }
@@ -58,36 +57,25 @@ struct AutoLiteratureReviewView: View {
             
             Divider()
             
-            
             VStack(alignment: .leading) {
-                ForEach(nlVM.args, id: \.self) { tArg in
-                    HStack(alignment: .top) {
+                List {
+                    ForEach(nlVM.args, id: \.self) { tArg in
                         if tArg.args.count > 0 {
-                            Text("Thesis:")
-                            Text("\(tArg.sentence)").foregroundColor(.blue)
-                            ForEach(tArg.args, id: \.self) { cArg in
-                                Text("Citation:")
-                                Text("\(cArg.sentence)").foregroundColor(cArg.supporting! ? .green : .red)
+                            HStack(alignment: .top) {
+                                Color.blue.frame(width: cgfWidth)
+                                VStack(alignment: .leading) {
+                                    Text("Thesis:")
+                                    Text("\(tArg.sentence)\n").foregroundColor(.blue)
+                                    Text("Citations:")
+                                    ForEach(tArg.args, id: \.self) { cArg in
+                                        cArgView(cgfWidth: cgfWidth, cArg: cArg)
+                                    }
+                                }
                             }
                         }
                     }
-                    if tArg.args.count > 0{
-                        Divider()
-                    }
                 }
-                Text("Thesis Keywords:")
-                HStack {
-                    ForEach(tKeywords, id: \.self) { keyword in
-                        Text("\(keyword)")
-                    }
-                }
-                Divider()
-                Text("Citation Keywords:")
-                HStack {
-                    ForEach(cKeywords, id: \.self) { keyword in
-                        Text("\(keyword)")
-                    }
-                }
+                keywords(tKeywords: tKeywords, cKeywords: cKeywords)
             }
         }
         .navigationTitle("Auto-Literature Review")
@@ -100,11 +88,18 @@ struct AutoLiteratureReviewView: View {
      The thesis should be uploaded from outside the app. A file picker should show up allowing the user to select their thesis PDF.
      */
     
+
+    
+    
+    
+    
+    
     private func analyse() {
         let docs = loadDocs()
         //citation = docs[0]
         nlVM.citations(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
-        
+        // TODO: everything in the nlVM needs to be on a separate thread, as these things can take a long time depending on source size
+        // TODO: make sure to put keywords on a new thread as well as we've seen it does freeze the main thread for a moment
         
         
         
@@ -197,5 +192,45 @@ struct AutoLiteratureReviewView: View {
 struct ImportView_Previews: PreviewProvider {
     static var previews: some View {
         AutoLiteratureReviewView()
+    }
+}
+
+struct cArgView: View {
+    let cgfWidth:CGFloat
+    var cArg: Argument
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            if cArg.supporting! {
+                Color.green.frame(width: cgfWidth)
+            } else {
+                Color.red.frame(width: cgfWidth)
+            }
+            
+            Text("\(cArg.info)\n")
+            Spacer()
+        }
+    }
+}
+
+struct keywords: View {
+    let tKeywords: Array<String>
+    let cKeywords: Array<String>
+    
+    var body: some View {
+        Divider()
+        Text("Thesis Keywords:")
+        HStack {
+            ForEach(tKeywords, id: \.self) { keyword in
+                Text("\(keyword)")
+            }
+        }
+        Divider()
+        Text("Citation Keywords:")
+        HStack {
+            ForEach(cKeywords, id: \.self) { keyword in
+                Text("\(keyword)")
+            }
+        }
     }
 }
