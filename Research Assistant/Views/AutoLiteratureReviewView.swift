@@ -91,7 +91,8 @@ struct AutoLiteratureReviewView: View {
                         Spacer()
                     }
                 }
-                keywords()
+                Text("Keywords:").bold()
+                Text("\(nlVM.keywordStr)")
             }
         }
         .padding()
@@ -117,10 +118,10 @@ struct AutoLiteratureReviewView: View {
         citation = docs[0]
         
         
-        nlVM.citations(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
-        nlVM.keywords(for: thesis)
-        nlVM.keywords(for: citation)
-        print("\nKeywords: \(nlVM.keywords)")
+        nlVM.analyse(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+//        nlVM.keywords(for: thesis)
+//        nlVM.keywords(for: citation)
+        //print("\nKeywords: \(nlVM.keywords)")
         
         
         // TODO: everything in the nlVM needs to be on a separate thread, as these things can take a long time depending on source size
@@ -255,11 +256,14 @@ struct keywords: View {
     
     var body: some View {
         Text("Keywords:").bold()
-        HStack {
-            ForEach(nlVM.keywords.map{$0.0}, id: \.self) { keyword in
-                Text("\(keyword)")
-            }
-        }
+        Text("\(nlVM.keywordStr)")
+        
+        
+//        HStack {
+//            ForEach(nlVM.keywords.map{$0.0}, id: \.self) { keyword in
+//                Text("\(combine(keyword: keyword))")
+//            }
+//        }
     }
 }
 

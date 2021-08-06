@@ -21,6 +21,10 @@ class NaturalLanguageViewModel: ObservableObject {
     @Published public var compareProgress: Int
     @Published public var args: Array<Argument> = []
     @Published public var keywords: ArraySlice<(String, Int)> = []
+    @Published public var keywordStr: String = ""
+    
+    
+    public var keywordDictionary: Dictionary<String, Int> = [:]
     
     init(language: NLLanguage = .english) {
         self.language = language
@@ -55,7 +59,7 @@ class NaturalLanguageViewModel: ObservableObject {
         return nearestArgs
     }
     
-    func citations(for doc1: String, from doc2: String, distanceThreshold: Double = 0.9) {
+    func analyse(for doc1: String, from doc2: String, distanceThreshold: Double = 0.9) {
         let sents1 = tokenize(text: doc1)
         let sents2 = tokenize(text: doc2)
         
@@ -71,9 +75,17 @@ class NaturalLanguageViewModel: ObservableObject {
                 queue.async(group: group) {
                     print("Analyzing Sentence: \(sent1)")
                     
+                    DispatchQueue.main.async {
+                        keywords(for: sent1)
+                    }
+                    
                     let sentiment1 = sentiment(for: sent1)
                     let analysis = Argument(sentence: sent1, sentiment: sentiment1)
                     sents2.forEach { sent2 in
+                        DispatchQueue.main.async {
+                            keywords(for: sent2)
+                        }
+                        
                         let sentiment2 = sentiment(for: sent2)
                         let distance = distance(between: sent1, and: sent2)
                         let sentiment = sentiment1 * sentiment2
@@ -162,17 +174,43 @@ class NaturalLanguageViewModel: ObservableObject {
             stopwords.contains(word.lowercased())
         }
         
-        let freqDic = words.reduce(into: [:]) { $0[$1, default: 0] += 1 } // From: https://stackoverflow.com/a/30545629/7653788
+        let freqDic = words.reduce(into: [:]) { $0[$1.lowercased(), default: 0] += 1 } // From: https://stackoverflow.com/a/30545629/7653788
         
-        var freqArr: Array<(String, Int)> = []
-        freqDic.sorted{ return $0.value > $1.value }.forEach { freqTup in
-            keywords.append((freqTup.key, freqTup.value))
+        freqDic.forEach { pair in
+            if keywordDictionary[pair.key] != nil {
+                keywordDictionary[pair.key]! += pair.value
+            } else {
+                keywordDictionary[pair.key] = pair.value
+            }
         }
         
-        keywords.forEach { keyword in
-            freqArr.append(keyword)
+        var count = 0
+        
+        keywordStr = ""
+        keywordDictionary.sorted{ return $0.value > $1.value }.forEach { keyword in
+            if count < n {
+                if keywordStr.isEmpty {
+                    keywordStr = "\(keyword.key)"
+                } else {
+                    keywordStr = "\(keywordStr), \(keyword.key)"
+                }
+            } else {
+                return
+            }
+            count += 1
         }
         
-        keywords = freqArr.prefix(n)
+//        keywords.forEach { keyword in
+//            freqArr.append(keyword)
+//        }
+        
+        //keywords = freqArr.prefix(n)
+        //print(keywords)
+        
+        
+        
+        
+        
+        
     }
 }
