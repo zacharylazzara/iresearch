@@ -73,14 +73,13 @@ struct AutoLiteratureReviewView: View {
                                 }
                             }
                         }
-                    }.onTapGesture {
-                        
                     }
                 }
                 Divider()
                 keywords()
             }
         }
+        .padding()
         .navigationTitle("Auto-Literature Review")
         Spacer()
     }
@@ -99,7 +98,7 @@ struct AutoLiteratureReviewView: View {
     
     private func analyse() {
         let docs = loadDocs()
-        //thesis = 
+        //thesis =
         //citation = docs[0]
         
         
