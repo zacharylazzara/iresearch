@@ -65,10 +65,10 @@ struct AutoLiteratureReviewView: View {
                                 Color.blue.frame(width: cgfWidth)
                                 VStack(alignment: .leading) {
                                     Text("Thesis:")
-                                    Text("\(tArg.sentence)\n").foregroundColor(.blue)
+                                    Text("\(tArg.sentence)\n").foregroundColor(.blue).fixedSize(horizontal: false, vertical: true)
                                     Text("Citations:")
                                     ForEach(tArg.args, id: \.self) { cArg in
-                                        cArgView(cgfWidth: cgfWidth, cArg: cArg)
+                                        cArgView(cgfWidth: cgfWidth, cArg: cArg).fixedSize(horizontal: false, vertical: true)
                                     }
                                 }
                             }
