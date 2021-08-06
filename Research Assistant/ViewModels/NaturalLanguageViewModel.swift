@@ -19,6 +19,7 @@ class NaturalLanguageViewModel: ObservableObject {
     @Published public var totalCompares: Int
     @Published public var compareProgress: Int
     @Published public var args: Array<Argument> = []
+    @Published public var keywords: ArraySlice<(String, Int)> = []
     
     init(language: NLLanguage = .english) {
         self.language = language
@@ -150,7 +151,7 @@ class NaturalLanguageViewModel: ObservableObject {
         return Double(distance!.description)!
     }
     
-    func keywords(for doc: String, top n: Int = 10) -> ArraySlice<(String, Int)> {
+    func keywords(for doc: String, top n: Int = 10) {
         let sDoc = sanitize(text: doc)
         var words = tokenize(text: sDoc, by: .word)
         
@@ -162,9 +163,13 @@ class NaturalLanguageViewModel: ObservableObject {
         
         var freqArr: Array<(String, Int)> = []
         freqDic.sorted{ return $0.value > $1.value }.forEach { freqTup in
-            freqArr.append((freqTup.key, freqTup.value))
+            keywords.append((freqTup.key, freqTup.value))
         }
         
-        return freqArr.prefix(n)
+        keywords.forEach { keyword in
+            freqArr.append(keyword)
+        }
+        
+        keywords = freqArr.prefix(n)
     }
 }

@@ -73,9 +73,12 @@ struct AutoLiteratureReviewView: View {
                                 }
                             }
                         }
+                    }.onTapGesture {
+                        
                     }
                 }
-                keywords(tKeywords: tKeywords, cKeywords: cKeywords)
+                Divider()
+                keywords()
             }
         }
         .navigationTitle("Auto-Literature Review")
@@ -96,8 +99,16 @@ struct AutoLiteratureReviewView: View {
     
     private func analyse() {
         let docs = loadDocs()
+        //thesis = 
         //citation = docs[0]
+        
+        
         nlVM.citations(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+        nlVM.keywords(for: thesis)
+        nlVM.keywords(for: citation)
+        print("\nKeywords: \(nlVM.keywords)")
+        
+        
         // TODO: everything in the nlVM needs to be on a separate thread, as these things can take a long time depending on source size
         // TODO: make sure to put keywords on a new thread as well as we've seen it does freeze the main thread for a moment
         
@@ -112,34 +123,11 @@ struct AutoLiteratureReviewView: View {
          Will need to make a dictionary or list of all the texts in the repository, so that we can search through everything to find the relevant papers.
          */
         
-        
-        
-        
-        //            let sents1 = nlViewModel.tokenize(text: doc1)
-        //            let sents2 = nlViewModel.tokenize(text: doc2)
-        
-        //            print("\nNLP Testing:")
-        //            let sep = "-----------------------------------"
-        //            sents1.forEach { sent1 in
-        //                print("\(sep)\n[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent1))]\n\(sent1)\n")
-        //                sents2.forEach { sent2 in
-        //                    print("\t[Sentiment: \(nlViewModel.sentimentAnalysis(for: sent2)), Distance: \(nlViewModel.sentenceDistance(sent1: sent1, sent2: sent2))]\n\t\(sent2)\n")
-        //                }
-        //            }
-        
         // TODO: Now we should be able to start making dictionaries of similarity and use the sentiment to roughly determine level of agreement
         // This may be of value: https://www.slideshare.net/vicknickkgp/analyzing-arguments-during-a-debate-using-natural-language-processing-in-python
         
         //print(nlViewModel.citations(for: thesis, from: citation))
-        print("\nThesis Keywords: \(nlVM.keywords(for: thesis))")
-        print("\nCitation Keywords: \(nlVM.keywords(for: citation))")
         
-        nlVM.keywords(for: thesis).forEach { keyword in
-            tKeywords.append(keyword.0)
-        }
-        nlVM.keywords(for: citation).forEach { keyword in
-            cKeywords.append(keyword.0)
-        }
     }
     
     private func loadDocs() -> [String] {
@@ -214,21 +202,12 @@ struct cArgView: View {
 }
 
 struct keywords: View {
-    let tKeywords: Array<String>
-    let cKeywords: Array<String>
+    @EnvironmentObject var nlVM: NaturalLanguageViewModel
     
     var body: some View {
-        Divider()
-        Text("Thesis Keywords:")
+        Text("Keywords:")
         HStack {
-            ForEach(tKeywords, id: \.self) { keyword in
-                Text("\(keyword)")
-            }
-        }
-        Divider()
-        Text("Citation Keywords:")
-        HStack {
-            ForEach(cKeywords, id: \.self) { keyword in
+            ForEach(nlVM.keywords.map{$0.0}, id: \.self) { keyword in
                 Text("\(keyword)")
             }
         }
