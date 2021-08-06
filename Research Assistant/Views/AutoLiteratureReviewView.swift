@@ -65,10 +65,11 @@ struct AutoLiteratureReviewView: View {
                                 Color.blue.frame(width: cgfWidth)
                                 VStack(alignment: .leading) {
                                     Text("Thesis Statement:").bold()
-                                    Text("\(tArg.sentence)\n").foregroundColor(.blue).fixedSize(horizontal: false, vertical: true)
+                                    tArgView(cgfWidth: cgfWidth, arg: tArg).fixedSize(horizontal: false, vertical: true)
+                                    Divider()
                                     Text("Citation Statement(s):").bold()
                                     ForEach(tArg.args, id: \.self) { cArg in
-                                        cArgView(cgfWidth: cgfWidth, cArg: cArg).fixedSize(horizontal: false, vertical: true)
+                                        cArgView(cgfWidth: cgfWidth, arg: cArg).fixedSize(horizontal: false, vertical: true)
                                     }
                                 }
                             }
@@ -182,19 +183,54 @@ struct ImportView_Previews: PreviewProvider {
     }
 }
 
-struct cArgView: View {
+struct tArgView: View {
     let cgfWidth:CGFloat
-    var cArg: Argument
+    var arg: Argument
     
     var body: some View {
         HStack(alignment: .top) {
-            if cArg.supporting! {
+            VStack(alignment: .leading) {
+                Text("\(arg.sentence)\n")
+                
+                HStack(alignment: .top) {
+                    Text("Sentiment:").bold()
+                    Text("\(arg.sentiment == 0 ? "Neutral" : arg.sentiment > 0 ? "Positive" : "Negative")")
+                }
+            }
+            Spacer()
+        }
+    }
+}
+
+struct cArgView: View {
+    let cgfWidth: CGFloat
+    let cgfHeight: CGFloat = 20
+    var arg: Argument
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            if arg.supporting! {
                 Color.green.frame(width: cgfWidth)
             } else {
                 Color.red.frame(width: cgfWidth)
             }
             
-            Text("\(cArg.info)")
+            VStack(alignment: .leading) {
+                Text("\(arg.sentence)\n")
+                
+                HStack(alignment: .center) {
+                    Text("Sentiment:").bold()
+                    Text("\(arg.sentiment == 0 ? "Neutral" : arg.sentiment > 0 ? "Positive" : "Negative")\t")
+                    
+                    Divider().frame(height: cgfHeight)
+                    Text("Relevance:").bold()
+                    Text("\(arg.distance! < 0.5 ? "High" : arg.distance! < 1 ? "Medium" : "Low")\t")
+                    
+                    Divider().frame(height: cgfHeight)
+                    Text("Supporting:").bold()
+                    Text("\(arg.supporting! ? "Yes" : "No")")
+                }
+            }
             Spacer()
         }
     }
@@ -204,7 +240,7 @@ struct keywords: View {
     @EnvironmentObject var nlVM: NaturalLanguageViewModel
     
     var body: some View {
-        Text("Keywords:")
+        Text("Keywords:").bold()
         HStack {
             ForEach(nlVM.keywords.map{$0.0}, id: \.self) { keyword in
                 Text("\(keyword)")
