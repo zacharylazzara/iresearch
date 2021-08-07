@@ -54,7 +54,21 @@ struct AutoLiteratureReviewView: View {
              Rather than searching through all documents at first, we can allow the user to select specific documents to search, or search all. We will determine the initial relevancy based on keyword matching. When matching keywords we must take into account the nearest neighbours of each word (words with similar meanings should be included in the matching process, but perhaps with slightly less weight than directly matching words). We may also want to compare abstracts before comparing full documents, as comparing the full document can take a very long time.
              */
             
-            ProgressView(value: nlVM.progress)
+            //ProgressView(value: nlVM.progress)
+            HStack(alignment: .center) {
+                //Spacer()
+                if nlVM.compareProgress <= 0 {
+                    Button(action: { analyse() }) {
+                        Text("\(Image(systemName: "doc.text.magnifyingglass")) Begin Analysis")
+                    }
+                } else if nlVM.percent >= 100 {
+                    Text("Analysis Complete").bold()
+                } else {
+                    Text("Analysis Progress:").bold()
+                    Text("\(nlVM.percent)% (\(nlVM.compareProgress)/\(nlVM.totalCompares))")
+                }
+                //Spacer()
+            }
             
             Divider()
             
@@ -76,21 +90,22 @@ struct AutoLiteratureReviewView: View {
                             }
                         }
                     }
-                    HStack(alignment: .center) {
-                        Spacer()
-                        if nlVM.compareProgress <= 0 {
-                            Button(action: { analyse() }) {
-                                Text("\(Image(systemName: "doc.text.magnifyingglass")) Begin Analysis")
-                            }
-                        } else if nlVM.percent >= 100 {
-                            Text("Analysis Complete").bold()
-                        } else {
-                            Text("Analysis Progress:").bold()
-                            Text("\(nlVM.percent)% (\(nlVM.compareProgress)/\(nlVM.totalCompares))")
-                        }
-                        Spacer()
-                    }
+//                    HStack(alignment: .center) {
+//                        Spacer()
+//                        if nlVM.compareProgress <= 0 {
+//                            Button(action: { analyse() }) {
+//                                Text("\(Image(systemName: "doc.text.magnifyingglass")) Begin Analysis")
+//                            }
+//                        } else if nlVM.percent >= 100 {
+//                            Text("Analysis Complete").bold()
+//                        } else {
+//                            Text("Analysis Progress:").bold()
+//                            Text("\(nlVM.percent)% (\(nlVM.compareProgress)/\(nlVM.totalCompares))")
+//                        }
+//                        Spacer()
+//                    }
                 }
+                ProgressView(value: nlVM.progress)
                 Text("Keywords:").bold()
                 Text("\(nlVM.keywordStr)")
             }
