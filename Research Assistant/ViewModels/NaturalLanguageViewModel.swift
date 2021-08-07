@@ -20,8 +20,7 @@ class NaturalLanguageViewModel: ObservableObject {
     @Published public var totalCompares: Int
     @Published public var compareProgress: Int
     @Published public var args: Array<Argument> = []
-    @Published public var keywords: ArraySlice<(String, Int)> = []
-    @Published public var keywordStr: String = ""
+    @Published public var keywordStr: String = "keyword (occurances)"
     
     
     public var keywordDictionary: Dictionary<String, Int> = [:]
@@ -190,27 +189,14 @@ class NaturalLanguageViewModel: ObservableObject {
         keywordDictionary.sorted{ return $0.value > $1.value }.forEach { keyword in
             if count < n {
                 if keywordStr.isEmpty {
-                    keywordStr = "\(keyword.key)"
+                    keywordStr = "\(keyword.key) (\(keyword.value))"
                 } else {
-                    keywordStr = "\(keywordStr), \(keyword.key)"
+                    keywordStr = "\(keywordStr), \(keyword.key) (\(keyword.value))"
                 }
             } else {
                 return
             }
             count += 1
         }
-        
-//        keywords.forEach { keyword in
-//            freqArr.append(keyword)
-//        }
-        
-        //keywords = freqArr.prefix(n)
-        //print(keywords)
-        
-        
-        
-        
-        
-        
     }
 }
