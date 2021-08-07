@@ -58,7 +58,7 @@ class NaturalLanguageViewModel: ObservableObject {
         return nearestArgs
     }
     
-    func analyse(for doc1: String, from doc2: String, distanceThreshold: Double = 0.9) {
+    func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, distanceThreshold: Double = 0.9) {
         let sents1 = tokenize(text: doc1)
         let sents2 = tokenize(text: doc2)
         
@@ -75,14 +75,14 @@ class NaturalLanguageViewModel: ObservableObject {
                     print("Analyzing Sentence: \(sent1)")
                     
                     DispatchQueue.main.async {
-                        keywords(for: sent1)
+                        keywords(for: sent1, top: nKeywords)
                     }
                     
                     let sentiment1 = sentiment(for: sent1)
                     let analysis = Argument(sentence: sent1, sentiment: sentiment1)
                     sents2.forEach { sent2 in
                         DispatchQueue.main.async {
-                            keywords(for: sent2)
+                            keywords(for: sent2, top: nKeywords)
                         }
                         
                         let sentiment2 = sentiment(for: sent2)
