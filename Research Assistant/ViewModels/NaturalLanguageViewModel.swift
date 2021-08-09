@@ -68,7 +68,11 @@ class NaturalLanguageViewModel: ObservableObject {
         case 0:
             maxDepth = sents2.count
         default:
-            maxDepth = depth
+            if depth < sents2.count {
+                maxDepth = depth
+            } else {
+                maxDepth = sents2.count
+            }
         }
         
         totalCompares = sents1.count * maxDepth

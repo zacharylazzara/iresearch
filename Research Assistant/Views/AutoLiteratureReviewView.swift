@@ -37,7 +37,7 @@ struct AutoLiteratureReviewView: View {
     @State private var importFile: Bool = false
     private let importingContentTypes: [UTType] = [UTType(filenameExtension: "pdf")].compactMap { $0 }
     
-    @State private var depth: Double = 0.0 // Number of reference sentences to compare. If 0 we will compare all sentences.
+    @State private var depth: Double = 20.0 // Number of reference sentences to compare. If 0 we will compare all sentences.
     
     
     
@@ -71,10 +71,10 @@ struct AutoLiteratureReviewView: View {
             HStack(alignment: .center) {
                 if !nlVM.analysisStarted {
                     VStack(alignment: .leading) {
-                        Slider(value: $depth, in: 0...500, step: 10)
+                        Slider(value: $depth, in: 10...510, step: 10)
                         HStack(alignment: .center) {
                             Text("Analysis Depth:").bold()
-                            Text("\(depth > 0 ? String(Int(depth)): "All") reference sentences")
+                            Text("\(depth > 500 ? "All" : String(Int(depth))) reference sentences")
                         }
                         Divider()
                         Button(action: { importFile = true }) {
@@ -91,6 +91,19 @@ struct AutoLiteratureReviewView: View {
             
             if nlVM.analysisStarted {
                 Divider()
+            } else {
+                
+                VStack(alignment: .center) {
+                    Spacer()
+                    HStack(alignment: .center) {
+                        Spacer()
+                        Text("Select your thesis to begin")
+                        Spacer()
+                    }
+                }
+                
+                
+                
             }
             
             VStack(alignment: .leading) {
@@ -183,7 +196,7 @@ struct AutoLiteratureReviewView: View {
         
         
         
-        nlVM.analyse(for: thesis, from: citation, depth: Int(depth)) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+        nlVM.analyse(for: thesis, from: citation, depth: Int((depth > 500 ? 0 : depth))) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
 //        nlVM.keywords(for: thesis)
 //        nlVM.keywords(for: citation)
         //print("\nKeywords: \(nlVM.keywords)")
