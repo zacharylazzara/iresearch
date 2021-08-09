@@ -25,7 +25,7 @@ struct AutoLiteratureReviewView: View {
     
     // From: http://dx.doi.org/10.1016/j.neunet.2016.11.003
     // Using this text for testing purposes for now.
-    @State private var citation: String = "The hard problem of consciousness is the problem of explaining how we experience qualia or phenome- nal experiences, such as seeing, hearing, and feeling, and knowing what they are. To solve this problem, a theory of consciousness needs to link brain to mind by modeling how emergent properties of several brain mechanisms interacting together embody detailed properties of individual conscious psychologi- cal experiences. This article summarizes evidence that Adaptive Resonance Theory, or ART, accomplishes this goal. ART is a cognitive and neural theory of how advanced brains autonomously learn to attend, rec- ognize, and predict objects and events in a changing world. ART has predicted that ‘‘all conscious states are resonant states’’ as part of its specification of mechanistic links between processes of consciousness, learning, expectation, attention, resonance, and synchrony. It hereby provides functional and mechanistic explanations of data ranging from individual spikes and their synchronization to the dynamics of con- scious perceptual, cognitive, and cognitive–emotional experiences. ART has reached sufficient maturity to begin classifying the brain resonances that support conscious experiences of seeing, hearing, feeling, and knowing. Psychological and neurobiological data in both normal individuals and clinical patients are clarified by this classification. This analysis also explains why not all resonances become conscious, and why not all brain dynamics are resonant. The global organization of the brain into computationally com- plementary cortical processing streams (complementary computing), and the organization of the cerebral cortex into characteristic layers of cells (laminar computing), figure prominently in these explanations of conscious and unconscious processes. Alternative models of consciousness are also discussed."
+    //@State private var citation: String = "The hard problem of consciousness is the problem of explaining how we experience qualia or phenome- nal experiences, such as seeing, hearing, and feeling, and knowing what they are. To solve this problem, a theory of consciousness needs to link brain to mind by modeling how emergent properties of several brain mechanisms interacting together embody detailed properties of individual conscious psychologi- cal experiences. This article summarizes evidence that Adaptive Resonance Theory, or ART, accomplishes this goal. ART is a cognitive and neural theory of how advanced brains autonomously learn to attend, rec- ognize, and predict objects and events in a changing world. ART has predicted that ‘‘all conscious states are resonant states’’ as part of its specification of mechanistic links between processes of consciousness, learning, expectation, attention, resonance, and synchrony. It hereby provides functional and mechanistic explanations of data ranging from individual spikes and their synchronization to the dynamics of con- scious perceptual, cognitive, and cognitive–emotional experiences. ART has reached sufficient maturity to begin classifying the brain resonances that support conscious experiences of seeing, hearing, feeling, and knowing. Psychological and neurobiological data in both normal individuals and clinical patients are clarified by this classification. This analysis also explains why not all resonances become conscious, and why not all brain dynamics are resonant. The global organization of the brain into computationally com- plementary cortical processing streams (complementary computing), and the organization of the cerebral cortex into characteristic layers of cells (laminar computing), figure prominently in these explanations of conscious and unconscious processes. Alternative models of consciousness are also discussed."
     
     // From: DOI 10.1007/s11023-014-9352-8
     // Using this text for testing purposes for now.
@@ -38,7 +38,7 @@ struct AutoLiteratureReviewView: View {
     private let importingContentTypes: [UTType] = [UTType(filenameExtension: "pdf")].compactMap { $0 }
     
     @State private var depth: Double = 20.0 // Number of reference sentences to compare. If 0 we will compare all sentences.
-    
+    @State private var isLibraryEmpty: Bool = false
     
     
     //    private var nlViewModel = NaturalLanguageViewModel(doc1: "", doc2: "")
@@ -91,8 +91,18 @@ struct AutoLiteratureReviewView: View {
             
             if nlVM.analysisStarted {
                 Divider()
-            } else {
                 
+                if isLibraryEmpty {
+                    VStack(alignment: .center) {
+                        Spacer()
+                        HStack(alignment: .center) {
+                            Spacer()
+                            Text("Your library is empty!")
+                            Spacer()
+                        }
+                    }
+                }
+            } else {
                 VStack(alignment: .center) {
                     Spacer()
                     HStack(alignment: .center) {
@@ -101,9 +111,6 @@ struct AutoLiteratureReviewView: View {
                         Spacer()
                     }
                 }
-                
-                
-                
             }
             
             VStack(alignment: .leading) {
@@ -157,6 +164,10 @@ struct AutoLiteratureReviewView: View {
                 print(error)
             }
         })
+        .alert(isPresented: self.$isLibraryEmpty){
+            return Alert(title: Text("Empty Library"), message: Text("Róka can only perform auto-literature review if your thesis and references are not empty!"), dismissButton: .default(Text("Dismiss")))
+        }
+        
         
         
         Spacer()
@@ -175,6 +186,7 @@ struct AutoLiteratureReviewView: View {
     
     
     private func analyse(thesis: String) {
+        let citation: String
         
         
         // TODO: lets change what the button does, then we can simply call analyse when we've loaded up the relevant PDF
@@ -192,11 +204,18 @@ struct AutoLiteratureReviewView: View {
         
         if docs.count > 0 {
             citation = docs[0] // TODO: we need to analyse for all docs
+        } else {
+            citation = ""
         }
         
+        do {
+            try nlVM.analyse(for: thesis, from: citation, depth: Int((depth > 500 ? 0 : depth)))
+        } catch {
+            print(error)
+            isLibraryEmpty = true
+        }
         
-        
-        nlVM.analyse(for: thesis, from: citation, depth: Int((depth > 500 ? 0 : depth))) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+         // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
 //        nlVM.keywords(for: thesis)
 //        nlVM.keywords(for: citation)
         //print("\nKeywords: \(nlVM.keywords)")

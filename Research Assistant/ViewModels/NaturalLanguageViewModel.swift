@@ -11,7 +11,7 @@ import NaturalLanguage
 class NaturalLanguageViewModel: ObservableObject {
     private let language:NLLanguage
     private let artifacts = [("- ", "")] // Artifacts should be replaced by the associated feature; i.e., (artififact, replacement)
-    private let stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
+    private let stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now", "per"]
     
     // TODO: Need to keep most of these functions off the main thread, as we may sometimes be working with a ton of data
     
@@ -58,7 +58,19 @@ class NaturalLanguageViewModel: ObservableObject {
         return nearestArgs
     }
     
-    func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, depth: Int = 0, distanceThreshold: Double = 0.9) {
+    func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, depth: Int = 0, distanceThreshold: Double = 0.9) throws {
+        if doc1.isEmpty || doc2.isEmpty {
+            throw AnalysisError.runtimeError("Empty thesis or reference document(s)")
+        }
+        
+        if depth < 0 {
+            throw AnalysisError.runtimeError("Depth (\(depth)) is out of range [0, infinity]")
+        }
+        
+        if distanceThreshold < 0 {
+            throw AnalysisError.runtimeError("Distance threshold (\(distanceThreshold)) is out of range [0, infinity]") // TODO: verify distance range is indeed [0, infinity]
+        }
+        
         analysisStarted = true
         let sents1 = tokenize(text: doc1)
         let sents2 = tokenize(text: doc2)
@@ -135,10 +147,11 @@ class NaturalLanguageViewModel: ObservableObject {
         }
         
         DispatchQueue.global().async(group: group, execute: workItem)
-
+        
         group.notify(queue: .main) { [self] in
             print("Document Analysis Complete:\n\(args)")
         }
+        
     }
     
     func tokenize(text: String, by unit: NLTokenUnit = .sentence) -> Array<String> {
