@@ -68,88 +68,32 @@ struct AutoLiteratureReviewView: View {
             // TODO: we need to figure out how to prevent the system from running out of RAM when analysing large documents. The system should never crash, and should be able
             // to analyse documents of any size without any slowdowns. The system should also be able to analyse documents when the app is in the background.
             
-            HStack(alignment: .center) {
-                if !analysisVM.analysisStarted {
-                    VStack(alignment: .leading) {
-                        Slider(value: $depth, in: 10...510, step: 10)
-                        HStack(alignment: .center) {
-                            Text("Analysis Depth:").bold()
-                            Text("\(depth > 500 ? "All" : String(Int(depth))) reference sentences")
-                        }
-                        Divider()
-                        Button(action: { importFile = true }) {
-                            Text("\(Image(systemName: "doc.text.magnifyingglass")) Select Thesis")
-                        }
-                    }
-                } else if analysisVM.percent >= 100 {
-                    Text("Analysis Complete").bold()
-                } else {
-                    Text("Analysis Progress:").bold()
-                    Text("\(analysisVM.percent)% (\(analysisVM.compareProgress)/\(analysisVM.sentCapacity))")
-                }
-            }
-            
-            if analysisVM.analysisStarted {
-                Divider()
-                
-                if isLibraryEmpty {
-                    VStack(alignment: .center) {
-                        Spacer()
-                        HStack(alignment: .center) {
-                            Spacer()
-                            Text("Your library is empty!")
-                            Spacer()
-                        }
-                    }
-                }
-            } else {
-                VStack(alignment: .center) {
-                    Spacer()
-                    HStack(alignment: .center) {
-                        Spacer()
-                        Text("Select your thesis to begin")
-                        Spacer()
-                    }
-                }
-            }
-            
-            VStack(alignment: .leading) {
-                List {
-                    ForEach(analysisVM.args, id: \.self) { tArg in
-                        if tArg.args.count > 0 {
-                            HStack(alignment: .top) {
-                                Color.blue.frame(width: cgfWidth)
-                                VStack(alignment: .leading) {
-                                    Text("Thesis Statement:").bold()
-                                    tArgView(cgfWidth: cgfWidth, arg: tArg).fixedSize(horizontal: false, vertical: true)
-                                    Divider()
-                                    Text("Citation Statement(s):").bold()
-                                    ForEach(tArg.args, id: \.self) { cArg in
-                                        cArgView(cgfWidth: cgfWidth, arg: cArg).fixedSize(horizontal: false, vertical: true)
-                                    }
-                                }
-                            }
-                        }
-                    }
-//                    HStack(alignment: .center) {
-//                        Spacer()
-//                        if nlVM.compareProgress <= 0 {
-//                            Button(action: { analyse() }) {
-//                                Text("\(Image(systemName: "doc.text.magnifyingglass")) Begin Analysis")
+            startAnalysis(importFile: $importFile, depth: $depth)
+            analysisView(isLibraryEmpty: $isLibraryEmpty)
+            listView(cgfWidth: cgfWidth)
+//            VStack(alignment: .leading) {
+//                List {
+//                    ForEach(analysisVM.args, id: \.self) { tArg in
+//                        if tArg.args.count > 0 {
+//                            HStack(alignment: .top) {
+//                                Color.blue.frame(width: cgfWidth)
+//                                VStack(alignment: .leading) {
+//                                    Text("Thesis Statement:").bold()
+//                                    tArgView(cgfWidth: cgfWidth, arg: tArg).fixedSize(horizontal: false, vertical: true)
+//                                    Divider()
+//                                    Text("Citation Statement(s):").bold()
+//                                    ForEach(tArg.args, id: \.self) { cArg in
+//                                        cArgView(cgfWidth: cgfWidth, arg: cArg).fixedSize(horizontal: false, vertical: true)
+//                                    }
+//                                }
 //                            }
-//                        } else if nlVM.percent >= 100 {
-//                            Text("Analysis Complete").bold()
-//                        } else {
-//                            Text("Analysis Progress:").bold()
-//                            Text("\(nlVM.percent)% (\(nlVM.compareProgress)/\(nlVM.totalCompares))")
 //                        }
-//                        Spacer()
 //                    }
-                }
-                ProgressView(value: analysisVM.progress)
-                Text("Keywords:").bold()
-                Text("\(analysisVM.keywordStr)")
-            }
+//                }
+//                ProgressView(value: analysisVM.progress)
+//                Text("Keywords:").bold()
+//                Text("\(analysisVM.keywordStr)")
+//            }
         }
         .padding()
         .navigationTitle("Auto-Literature Review")
@@ -299,6 +243,113 @@ struct tArgView: View {
                 }
             }
             Spacer()
+        }
+    }
+}
+
+struct startAnalysis: View {
+    @EnvironmentObject var analysisVM: AnalysisViewModel
+    @Binding var importFile: Bool
+    @Binding var depth: Double
+    
+    var body: some View {
+        HStack(alignment: .center) {
+            if !analysisVM.analysisStarted {
+                VStack(alignment: .leading) {
+                    Slider(value: $depth, in: 10...510, step: 10)
+                    HStack(alignment: .center) {
+                        Text("Analysis Depth:").bold()
+                        Text("\(depth > 500 ? "All" : String(Int(depth))) reference sentences")
+                    }
+                    Divider()
+                    Button(action: { importFile = true }) {
+                        Text("\(Image(systemName: "doc.text.magnifyingglass")) Select Thesis")
+                    }
+                }
+            } else if analysisVM.percent >= 100 {
+                Text("Analysis Complete").bold()
+            } else {
+                Text("Analysis Progress:").bold()
+                Text("\(analysisVM.percent)% (\(analysisVM.compareProgress)/\(analysisVM.sentCapacity))")
+            }
+        }
+    }
+}
+
+struct analysisView: View {
+    @EnvironmentObject var analysisVM: AnalysisViewModel
+    @Binding var isLibraryEmpty: Bool
+    
+    var body: some View {
+        if analysisVM.analysisStarted {
+            Divider()
+            
+            if isLibraryEmpty {
+                VStack(alignment: .center) {
+                    Spacer()
+                    HStack(alignment: .center) {
+                        Spacer()
+                        Text("Your library is empty!")
+                        Spacer()
+                    }
+                }
+            }
+        } else {
+            VStack(alignment: .center) {
+                Spacer()
+                HStack(alignment: .center) {
+                    Spacer()
+                    Text("Select your thesis to begin")
+                    Spacer()
+                }
+            }
+        }
+    }
+}
+
+struct listView: View {
+    @EnvironmentObject var analysisVM: AnalysisViewModel
+    let cgfWidth: CGFloat
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            List {
+                ForEach(analysisVM.argArr, id: \.self) { tArgStr in
+                    if tArgStr.count > 0 && analysisVM.argDict[tArgStr] != nil && analysisVM.argDict[tArgStr]!.1.count > 0 {
+                        thesisCompare(tArg: analysisVM.argDict[tArgStr]!.0, cgfWidth: cgfWidth)
+                    }
+                }
+            }
+            ProgressView(value: analysisVM.progress)
+            Text("Keywords:").bold()
+            Text("\(analysisVM.keywordStr)")
+        }
+    }
+}
+
+struct thesisCompare: View {
+    @EnvironmentObject var analysisVM: AnalysisViewModel
+    let tArg: Argument
+    let cgfWidth: CGFloat
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            Color.blue.frame(width: cgfWidth)
+            VStack(alignment: .leading) {
+                Text("Thesis Statement:").bold()
+                tArgView(cgfWidth: cgfWidth, arg: tArg).fixedSize(horizontal: false, vertical: true)
+                Divider()
+                Text("Citation Statement(s):").bold()
+                ForEach(analysisVM.argArr, id: \.self) { tArgStr in
+                    if analysisVM.argDict[tArgStr] != nil && analysisVM.argDict[tArgStr]!.1.count > 0 {
+                        let dic = analysisVM.argDict[tArgStr]!.1
+                        
+                        ForEach(dic) { cArg in
+                            cArgView(cgfWidth: cgfWidth, arg: cArg).fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+            }
         }
     }
 }

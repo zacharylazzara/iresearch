@@ -17,7 +17,13 @@ class AnalysisViewModel: ObservableObject {
     @Published public var percent: Int
     @Published public var sentCapacity: Int
     @Published public var compareProgress: Int
-    @Published public var args: Array<Argument>
+    //@Published public var args: Array<Argument>
+    
+    @Published public var argDict: Dictionary<String, (Argument, [Argument])>
+    @Published public var argArr: Array<String>
+    
+    
+    
     @Published public var keywordStr: String
     @Published public var analysisStarted: Bool
     
@@ -29,7 +35,11 @@ class AnalysisViewModel: ObservableObject {
         self.percent = 0
         self.sentCapacity = 0
         self.compareProgress = 0
-        self.args = []
+        //self.args = []
+        
+        self.argDict = [:]
+        self.argArr = []
+        
         self.keywordStr = "keyword (occurances)"
         self.analysisStarted = false
         
@@ -45,26 +55,26 @@ class AnalysisViewModel: ObservableObject {
         return sText
     }
     
-    func nearestArgs(for args: Array<Argument>, distanceThreshold: Double = 0.9) throws -> Array<Argument> {
-        if distanceThreshold < 0 {
-            throw AnalysisError.runtimeError("Distance threshold (\(distanceThreshold)) is out of range [0, infinity]") // TODO: verify distance range is indeed [0, infinity]
-        }
-        
-        var nearestArgs: Array<Argument> = []
-        args.forEach { arg in
-            let nearestArg = arg.args.max(by: { c, _ in
-                return c.distance! < distanceThreshold // TODO: redo this part, and follow from https://stackoverflow.com/questions/56916160/find-nearest-smaller-number-in-array
-            })
-            
-            arg.args = []
-            if nearestArg != nil {
-                arg.args.append(nearestArg!)
-            }
-            
-            nearestArgs.append(arg)
-        }
-        return nearestArgs
-    }
+//    func nearestArgs(for args: Array<Argument>, distanceThreshold: Double = 0.9) throws -> Array<Argument> {
+//        if distanceThreshold < 0 {
+//            throw AnalysisError.runtimeError("Distance threshold (\(distanceThreshold)) is out of range [0, infinity]") // TODO: verify distance range is indeed [0, infinity]
+//        }
+//
+//        var nearestArgs: Array<Argument> = []
+//        args.forEach { arg in
+//            let nearestArg = arg.args.max(by: { c, _ in
+//                return c.distance! < distanceThreshold // TODO: redo this part, and follow from https://stackoverflow.com/questions/56916160/find-nearest-smaller-number-in-array
+//            })
+//
+//            arg.args = []
+//            if nearestArg != nil {
+//                arg.args.append(nearestArg!)
+//            }
+//
+//            nearestArgs.append(arg)
+//        }
+//        return nearestArgs
+//    }
     
     func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, depth: Int = 0, distanceThreshold: Double = 0.9) throws {
         if doc1.isEmpty || doc2.isEmpty {
@@ -92,7 +102,9 @@ class AnalysisViewModel: ObservableObject {
         }
         
         sentCapacity = sents1.count * maxDepth
-        args.reserveCapacity(sentCapacity)
+        //args.reserveCapacity(sentCapacity)
+        argDict.reserveCapacity(sentCapacity)
+        argArr = sents1
         
         compareProgress = 0
         percent = 0
@@ -111,8 +123,15 @@ class AnalysisViewModel: ObservableObject {
                         keywords(for: sent1, top: nKeywords)
                     }
                     
-                    let sentiment1 = sentiment(for: sent1)
-                    let analysis = Argument(sentence: sent1, sentiment: sentiment1)
+                    let sentiment1: Double = sentiment(for: sent1)
+                    let thesis: Argument = Argument(sentence: sent1, sentiment: sentiment1)
+                    
+                    DispatchQueue.main.async {
+                        var references: Array<Argument> = []
+                            references.reserveCapacity(maxDepth)
+                        
+                        argDict[thesis.sentence] = (thesis, references)
+                    }
                     
                     for sent2 in sents2 {
                         currentDepth += 1
@@ -121,12 +140,13 @@ class AnalysisViewModel: ObservableObject {
                             keywords(for: sent2, top: nKeywords)
                         }
                         
-                        let sentiment2 = sentiment(for: sent2)
-                        let distance = distance(between: sent1, and: sent2)
-                        let sentiment = sentiment1 * sentiment2
+                        let sentiment2: Double = sentiment(for: sent2)
+                        let distance: Double = distance(between: sent1, and: sent2)
                         
                         if distance < distanceThreshold {
-                            analysis.args.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: sentiment >= 0))
+                            DispatchQueue.main.async {
+                                argDict[thesis.sentence]!.1.append(Argument(sentence: sent2, sentiment: sentiment2, distance: distance, supporting: (sentiment1 * sentiment2) >= 0))
+                            }
                         }
                         
                         DispatchQueue.main.async {
@@ -137,14 +157,10 @@ class AnalysisViewModel: ObservableObject {
                         
                         print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(sentCapacity)), Depth: \(currentDepth)/\(maxDepth)")
                         
-                        if currentDepth > maxDepth {
-                            print("Depth (\(maxDepth)) reached!")
+                        if currentDepth >= maxDepth {
+                            print("Maximum depth of \(maxDepth) reached!")
                             break
                         }
-                    }
-                    
-                    DispatchQueue.main.async {
-                        args.append(analysis)
                     }
                     
                     print("\nFinished Analyzing Sentence: \(sent1)\n")
@@ -154,8 +170,8 @@ class AnalysisViewModel: ObservableObject {
         
         DispatchQueue.global().async(group: group, execute: workItem)
         
-        group.notify(queue: .main) { [self] in
-            print("Document Analysis Complete:\n\(args)")
+        group.notify(queue: .main) {
+            print("Document Analysis Complete")
         }
         
     }
