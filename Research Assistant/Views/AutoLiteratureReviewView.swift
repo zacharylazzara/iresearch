@@ -85,7 +85,7 @@ struct AutoLiteratureReviewView: View {
                     Text("Analysis Complete").bold()
                 } else {
                     Text("Analysis Progress:").bold()
-                    Text("\(analysisVM.percent)% (\(analysisVM.compareProgress)/\(analysisVM.totalCompares))")
+                    Text("\(analysisVM.percent)% (\(analysisVM.compareProgress)/\(analysisVM.sentCapacity))")
                 }
             }
             

@@ -7,6 +7,10 @@
 
 import Foundation
 
+// TODO: we're getting a memory leak around the 3 minute mark; need to try and reduce our memory usage. Perhaps we can make these arguments more memory friendly?
+
+
+
 public class Argument: CustomStringConvertible, Hashable {
     public static func == (lhs: Argument, rhs: Argument) -> Bool {
         return lhs.sentence == rhs.sentence

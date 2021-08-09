@@ -15,7 +15,7 @@ class AnalysisViewModel: ObservableObject {
     
     @Published public var progress: Double
     @Published public var percent: Int
-    @Published public var totalCompares: Int
+    @Published public var sentCapacity: Int
     @Published public var compareProgress: Int
     @Published public var args: Array<Argument>
     @Published public var keywordStr: String
@@ -27,7 +27,7 @@ class AnalysisViewModel: ObservableObject {
         self.language = language
         self.progress = 0.0
         self.percent = 0
-        self.totalCompares = 0
+        self.sentCapacity = 0
         self.compareProgress = 0
         self.args = []
         self.keywordStr = "keyword (occurances)"
@@ -91,7 +91,9 @@ class AnalysisViewModel: ObservableObject {
             }
         }
         
-        totalCompares = sents1.count * maxDepth
+        sentCapacity = sents1.count * maxDepth
+        args.reserveCapacity(sentCapacity)
+        
         compareProgress = 0
         percent = 0
         
@@ -101,7 +103,7 @@ class AnalysisViewModel: ObservableObject {
         let workItem = DispatchWorkItem { [self] in
             sents1.forEach { sent1 in
                 queue.async(group: group) {
-                    var currentDepth = 0
+                    var currentDepth: Int = 0
                     
                     print("Analyzing Sentence: \(sent1)")
                     
@@ -129,11 +131,11 @@ class AnalysisViewModel: ObservableObject {
                         
                         DispatchQueue.main.async {
                             compareProgress += 1
-                            progress = Double(compareProgress) / Double(totalCompares)
+                            progress = Double(compareProgress) / Double(sentCapacity)
                             percent = Int(progress * 100)
                         }
                         
-                        print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(totalCompares)), Depth: \(currentDepth)/\(maxDepth)")
+                        print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(sentCapacity)), Depth: \(currentDepth)/\(maxDepth)")
                         
                         if currentDepth > maxDepth {
                             print("Depth (\(maxDepth)) reached!")

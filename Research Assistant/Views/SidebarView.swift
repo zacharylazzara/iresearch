@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SidebarView: View {
-    @State private var selection: Int? = 1
+    @State private var selection: Int? = 2
     @State private var title: String = "Home"
     
     
