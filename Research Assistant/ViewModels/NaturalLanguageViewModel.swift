@@ -21,7 +21,7 @@ class NaturalLanguageViewModel: ObservableObject {
     @Published public var compareProgress: Int
     @Published public var args: Array<Argument> = []
     @Published public var keywordStr: String = "keyword (occurances)"
-    
+    @Published public var analysisStarted: Bool = false
     
     public var keywordDictionary: Dictionary<String, Int> = [:]
     
@@ -58,16 +58,17 @@ class NaturalLanguageViewModel: ObservableObject {
         return nearestArgs
     }
     
-    func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, depth: Int? = nil, distanceThreshold: Double = 0.9) {
+    func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, depth: Int = 0, distanceThreshold: Double = 0.9) {
+        analysisStarted = true
         let sents1 = tokenize(text: doc1)
         let sents2 = tokenize(text: doc2)
         let maxDepth: Int
         
         switch depth {
-        case Optional<Int>.none:
+        case 0:
             maxDepth = sents2.count
         default:
-            maxDepth = depth!
+            maxDepth = depth
         }
         
         totalCompares = sents1.count * maxDepth

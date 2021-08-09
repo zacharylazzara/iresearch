@@ -37,8 +37,8 @@ struct AutoLiteratureReviewView: View {
     @State private var importFile: Bool = false
     private let importingContentTypes: [UTType] = [UTType(filenameExtension: "pdf")].compactMap { $0 }
     
-    @State private var recordDepth: Int? = 10 // Maximum number of sentences to use; if nil we read all records
-    // TODO: implement maxRecords
+    @State private var depth: Double = 0.0 // Number of reference sentences to compare. If 0 we will compare all sentences.
+    
     
     
     //    private var nlViewModel = NaturalLanguageViewModel(doc1: "", doc2: "")
@@ -61,12 +61,25 @@ struct AutoLiteratureReviewView: View {
              Rather than searching through all documents at first, we can allow the user to select specific documents to search, or search all. We will determine the initial relevancy based on keyword matching. When matching keywords we must take into account the nearest neighbours of each word (words with similar meanings should be included in the matching process, but perhaps with slightly less weight than directly matching words). We may also want to compare abstracts before comparing full documents, as comparing the full document can take a very long time.
              */
             
-            //ProgressView(value: nlVM.progress)
+            
+            // TODO: we'll need a way to specify pages later; then we can allow the user to select which pages they wish to analyse. Also need to let them select which documents.
+            // In general we need more tuning controls for the user.
+            
+            // TODO: we need to figure out how to prevent the system from running out of RAM when analysing large documents. The system should never crash, and should be able
+            // to analyse documents of any size without any slowdowns. The system should also be able to analyse documents when the app is in the background.
+            
             HStack(alignment: .center) {
-                //Spacer()
-                if nlVM.compareProgress <= 0 {
-                    Button(action: { importFile = true }) {
-                        Text("\(Image(systemName: "doc.text.magnifyingglass")) Begin Analysis")
+                if !nlVM.analysisStarted {
+                    VStack(alignment: .leading) {
+                        Slider(value: $depth, in: 0...500, step: 10)
+                        HStack(alignment: .center) {
+                            Text("Analysis Depth:").bold()
+                            Text("\(depth > 0 ? String(Int(depth)): "All") reference sentences")
+                        }
+                        Divider()
+                        Button(action: { importFile = true }) {
+                            Text("\(Image(systemName: "doc.text.magnifyingglass")) Select Thesis")
+                        }
                     }
                 } else if nlVM.percent >= 100 {
                     Text("Analysis Complete").bold()
@@ -74,10 +87,11 @@ struct AutoLiteratureReviewView: View {
                     Text("Analysis Progress:").bold()
                     Text("\(nlVM.percent)% (\(nlVM.compareProgress)/\(nlVM.totalCompares))")
                 }
-                //Spacer()
             }
             
-            Divider()
+            if nlVM.analysisStarted {
+                Divider()
+            }
             
             VStack(alignment: .leading) {
                 List {
@@ -159,10 +173,17 @@ struct AutoLiteratureReviewView: View {
         
         let docs = loadDocs()
         //thesis =
-        citation = docs[0] // TODO: we need to analyse for all docs
+        // TODO: need an error message if there's no docs
         
         
-        nlVM.analyse(for: thesis, from: citation, depth: recordDepth) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+        
+        if docs.count > 0 {
+            citation = docs[0] // TODO: we need to analyse for all docs
+        }
+        
+        
+        
+        nlVM.analyse(for: thesis, from: citation, depth: Int(depth)) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
 //        nlVM.keywords(for: thesis)
 //        nlVM.keywords(for: citation)
         //print("\nKeywords: \(nlVM.keywords)")
