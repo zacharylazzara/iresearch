@@ -168,8 +168,6 @@ struct AutoLiteratureReviewView: View {
             return Alert(title: Text("Empty Library"), message: Text("Róka can only perform auto-literature review if your thesis and references are not empty!"), dismissButton: .default(Text("Dismiss")))
         }
         
-        
-        
         Spacer()
     }
     
@@ -179,33 +177,14 @@ struct AutoLiteratureReviewView: View {
      The thesis should be uploaded from outside the app. A file picker should show up allowing the user to select their thesis PDF.
      */
     
-
-    
-    
-    
-    
-    
     private func analyse(thesis: String) {
-        let citation: String
-        
-        
-        // TODO: lets change what the button does, then we can simply call analyse when we've loaded up the relevant PDF
-        
-//        while importFile {
-//            // TODO: wait until its true
-//            // TODO: must do this on a separate thread or something like that
-//        }
-        
         let docs = loadDocs()
-        //thesis =
-        // TODO: need an error message if there's no docs
-        
-        
+        var citation = ""
         
         if docs.count > 0 {
-            citation = docs[0] // TODO: we need to analyse for all docs
-        } else {
-            citation = ""
+            docs.forEach { doc in
+                citation.append(doc)
+            }
         }
         
         do {
