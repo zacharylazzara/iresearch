@@ -15,6 +15,7 @@
 
 import SwiftUI
 import PDFKit
+import UniformTypeIdentifiers
 
 struct AutoLiteratureReviewView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
@@ -28,10 +29,13 @@ struct AutoLiteratureReviewView: View {
     
     // From: DOI 10.1007/s11023-014-9352-8
     // Using this text for testing purposes for now.
-    @State private var thesis: String = "If a brain is uploaded into a computer, will consciousness continue in digital form or will it end forever when the brain is destroyed? Philosophers have long debated such dilemmas and classify them as questions about personal identity. There are currently three main theories of personal identity: biological, psycho- logical, and closest continuer theories. None of these theories can successfully address the questions posed by the possibility of uploading. I will argue that uploading requires us to adopt a new theory of identity, psychological branching identity. Psychological branching identity states that consciousness will continue as long as there is continuity in psychological structure. What differentiates this from psychological identity is that it allows identity to continue in multiple selves. According to branching identity, continuity of consciousness will continue in both the original brain and the upload after nondestructive uploading. Branching identity can also resolve long standing questions about split-brain syndrome and can provide clear predictions about identity in even the most difficult cases imagined by philosophers."
+    //@State private var thesis: String = "If a brain is uploaded into a computer, will consciousness continue in digital form or will it end forever when the brain is destroyed? Philosophers have long debated such dilemmas and classify them as questions about personal identity. There are currently three main theories of personal identity: biological, psycho- logical, and closest continuer theories. None of these theories can successfully address the questions posed by the possibility of uploading. I will argue that uploading requires us to adopt a new theory of identity, psychological branching identity. Psychological branching identity states that consciousness will continue as long as there is continuity in psychological structure. What differentiates this from psychological identity is that it allows identity to continue in multiple selves. According to branching identity, continuity of consciousness will continue in both the original brain and the upload after nondestructive uploading. Branching identity can also resolve long standing questions about split-brain syndrome and can provide clear predictions about identity in even the most difficult cases imagined by philosophers."
     
     @State private var tKeywords: Array<String> = []
     @State private var cKeywords: Array<String> = []
+    
+    @State private var importFile: Bool = false
+    let importingContentTypes: [UTType] = [UTType(filenameExtension: "pdf")].compactMap { $0 }
     
     
     //    private var nlViewModel = NaturalLanguageViewModel(doc1: "", doc2: "")
@@ -58,7 +62,7 @@ struct AutoLiteratureReviewView: View {
             HStack(alignment: .center) {
                 //Spacer()
                 if nlVM.compareProgress <= 0 {
-                    Button(action: { analyse() }) {
+                    Button(action: { importFile = true }) {
                         Text("\(Image(systemName: "doc.text.magnifyingglass")) Begin Analysis")
                     }
                 } else if nlVM.percent >= 100 {
@@ -112,6 +116,19 @@ struct AutoLiteratureReviewView: View {
         }
         .padding()
         .navigationTitle("Auto-Literature Review")
+        .fileImporter(isPresented: $importFile, allowedContentTypes: importingContentTypes, onCompletion: {file in
+            // TODO: whatever processing we need to do here
+            //file.get() // TODO: get the URL?
+            do {
+                if let pdf = PDFDocument(url: try file.get()) {
+                    analyse(thesis: readPDF(pdf: pdf))
+                }
+            } catch {
+                print(error)
+            }
+        })
+        
+        
         Spacer()
     }
     
@@ -127,7 +144,16 @@ struct AutoLiteratureReviewView: View {
     
     
     
-    private func analyse() {
+    private func analyse(thesis: String) {
+        
+        
+        // TODO: lets change what the button does, then we can simply call analyse when we've loaded up the relevant PDF
+        
+//        while importFile {
+//            // TODO: wait until its true
+//            // TODO: must do this on a separate thread or something like that
+//        }
+        
         let docs = loadDocs()
         //thesis =
         citation = docs[0]
@@ -178,21 +204,43 @@ struct AutoLiteratureReviewView: View {
                     
                     
                     // Adapted from: https://www.hackingwithswift.com/example-code/libraries/how-to-extract-text-from-a-pdf-using-pdfkit
+                    
+                    
+                    
+                    
+                    
+                    
                     if let pdf = PDFDocument(url: file.url) {
-                        let pageCount = pdf.pageCount
-                        let documentContent = NSMutableAttributedString()
-
-                        for i in 0 ..< pageCount {
-                            guard let page = pdf.page(at: i) else { continue }
-                            guard let pageContent = page.attributedString else { continue }
-                            documentContent.append(pageContent)
-                        }
-                        documents.append(documentContent.string)
+                        documents.append(readPDF(pdf: pdf))
+                        
+                        
+//
+//                        let pageCount = pdf.pageCount
+//                        let documentContent = NSMutableAttributedString()
+//
+//                        for i in 0 ..< pageCount {
+//                            guard let page = pdf.page(at: i) else { continue }
+//                            guard let pageContent = page.attributedString else { continue }
+//                            documentContent.append(pageContent)
+//                        }
+//                        documents.append(documentContent.string)
                     }
                 }
             }
         }
         return documents
+    }
+    
+    private func readPDF(pdf: PDFDocument) -> String {
+        let pageCount = pdf.pageCount
+        let documentContent = NSMutableAttributedString()
+
+        for i in 0 ..< pageCount {
+            guard let page = pdf.page(at: i) else { continue }
+            guard let pageContent = page.attributedString else { continue }
+            documentContent.append(pageContent)
+        }
+        return documentContent.string
     }
 
     

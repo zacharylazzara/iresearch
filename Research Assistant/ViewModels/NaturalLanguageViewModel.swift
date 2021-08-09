@@ -183,7 +183,7 @@ class NaturalLanguageViewModel: ObservableObject {
             }
         }
         
-        var count = 0
+        var count = 0 // TODO: verify we're actually getting top n and not n+1 or n-1
         
         keywordStr = ""
         keywordDictionary.sorted{ return $0.value > $1.value }.forEach { keyword in
