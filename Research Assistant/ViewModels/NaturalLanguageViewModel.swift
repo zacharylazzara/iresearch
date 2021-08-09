@@ -58,11 +58,19 @@ class NaturalLanguageViewModel: ObservableObject {
         return nearestArgs
     }
     
-    func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, distanceThreshold: Double = 0.9) {
+    func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, depth: Int? = nil, distanceThreshold: Double = 0.9) {
         let sents1 = tokenize(text: doc1)
         let sents2 = tokenize(text: doc2)
+        let maxDepth: Int
         
-        totalCompares = sents1.count * sents2.count
+        switch depth {
+        case Optional<Int>.none:
+            maxDepth = sents2.count
+        default:
+            maxDepth = depth!
+        }
+        
+        totalCompares = sents1.count * maxDepth
         compareProgress = 0
         percent = 0
         
@@ -72,6 +80,8 @@ class NaturalLanguageViewModel: ObservableObject {
         let workItem = DispatchWorkItem { [self] in
             sents1.forEach { sent1 in
                 queue.async(group: group) {
+                    var currentDepth = 0
+                    
                     print("Analyzing Sentence: \(sent1)")
                     
                     DispatchQueue.main.async {
@@ -80,7 +90,10 @@ class NaturalLanguageViewModel: ObservableObject {
                     
                     let sentiment1 = sentiment(for: sent1)
                     let analysis = Argument(sentence: sent1, sentiment: sentiment1)
-                    sents2.forEach { sent2 in
+                    
+                    for sent2 in sents2 {
+                        currentDepth += 1
+                        
                         DispatchQueue.main.async {
                             keywords(for: sent2, top: nKeywords)
                         }
@@ -99,7 +112,12 @@ class NaturalLanguageViewModel: ObservableObject {
                             percent = Int(progress * 100)
                         }
                         
-                        print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(totalCompares))")
+                        print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(totalCompares)), Depth: \(currentDepth)/\(maxDepth)")
+                        
+                        if currentDepth > maxDepth {
+                            print("Depth (\(maxDepth)) reached!")
+                            break
+                        }
                     }
                     
                     DispatchQueue.main.async {

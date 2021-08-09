@@ -35,7 +35,10 @@ struct AutoLiteratureReviewView: View {
     @State private var cKeywords: Array<String> = []
     
     @State private var importFile: Bool = false
-    let importingContentTypes: [UTType] = [UTType(filenameExtension: "pdf")].compactMap { $0 }
+    private let importingContentTypes: [UTType] = [UTType(filenameExtension: "pdf")].compactMap { $0 }
+    
+    @State private var recordDepth: Int? = 10 // Maximum number of sentences to use; if nil we read all records
+    // TODO: implement maxRecords
     
     
     //    private var nlViewModel = NaturalLanguageViewModel(doc1: "", doc2: "")
@@ -156,10 +159,10 @@ struct AutoLiteratureReviewView: View {
         
         let docs = loadDocs()
         //thesis =
-        citation = docs[0]
+        citation = docs[0] // TODO: we need to analyse for all docs
         
         
-        nlVM.analyse(for: thesis, from: citation) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
+        nlVM.analyse(for: thesis, from: citation, depth: recordDepth) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
 //        nlVM.keywords(for: thesis)
 //        nlVM.keywords(for: citation)
         //print("\nKeywords: \(nlVM.keywords)")
