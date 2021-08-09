@@ -13,8 +13,6 @@ class AnalysisViewModel: ObservableObject {
     private let artifacts: Array<(String, String)>
     private let stopwords: Array<String>
     
-    // TODO: Need to keep most of these functions off the main thread, as we may sometimes be working with a ton of data
-    
     @Published public var progress: Double
     @Published public var percent: Int
     @Published public var totalCompares: Int
@@ -212,7 +210,7 @@ class AnalysisViewModel: ObservableObject {
         var words = tokenize(text: sDoc, by: .word)
         
         words.removeAll { word in
-            stopwords.contains(word.lowercased()) || Int(word) != nil || word.count < 4
+            stopwords.contains(word.lowercased()) || Int(word) != nil || word.count < 3
         }
         
         let freqDic = words.reduce(into: [:]) { $0[$1.lowercased(), default: 0] += 1 } // From: https://stackoverflow.com/a/30545629/7653788

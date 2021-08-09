@@ -19,7 +19,7 @@ import UniformTypeIdentifiers
 
 struct AutoLiteratureReviewView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
-    @EnvironmentObject var nlVM: AnalysisViewModel
+    @EnvironmentObject var analysisVM: AnalysisViewModel
     @State private var link: String = "" // TODO: download from link somehow
     private let cgfWidth: CGFloat = 5
     
@@ -69,7 +69,7 @@ struct AutoLiteratureReviewView: View {
             // to analyse documents of any size without any slowdowns. The system should also be able to analyse documents when the app is in the background.
             
             HStack(alignment: .center) {
-                if !nlVM.analysisStarted {
+                if !analysisVM.analysisStarted {
                     VStack(alignment: .leading) {
                         Slider(value: $depth, in: 10...510, step: 10)
                         HStack(alignment: .center) {
@@ -81,15 +81,15 @@ struct AutoLiteratureReviewView: View {
                             Text("\(Image(systemName: "doc.text.magnifyingglass")) Select Thesis")
                         }
                     }
-                } else if nlVM.percent >= 100 {
+                } else if analysisVM.percent >= 100 {
                     Text("Analysis Complete").bold()
                 } else {
                     Text("Analysis Progress:").bold()
-                    Text("\(nlVM.percent)% (\(nlVM.compareProgress)/\(nlVM.totalCompares))")
+                    Text("\(analysisVM.percent)% (\(analysisVM.compareProgress)/\(analysisVM.totalCompares))")
                 }
             }
             
-            if nlVM.analysisStarted {
+            if analysisVM.analysisStarted {
                 Divider()
                 
                 if isLibraryEmpty {
@@ -115,7 +115,7 @@ struct AutoLiteratureReviewView: View {
             
             VStack(alignment: .leading) {
                 List {
-                    ForEach(nlVM.args, id: \.self) { tArg in
+                    ForEach(analysisVM.args, id: \.self) { tArg in
                         if tArg.args.count > 0 {
                             HStack(alignment: .top) {
                                 Color.blue.frame(width: cgfWidth)
@@ -146,9 +146,9 @@ struct AutoLiteratureReviewView: View {
 //                        Spacer()
 //                    }
                 }
-                ProgressView(value: nlVM.progress)
+                ProgressView(value: analysisVM.progress)
                 Text("Keywords:").bold()
-                Text("\(nlVM.keywordStr)")
+                Text("\(analysisVM.keywordStr)")
             }
         }
         .padding()
@@ -188,7 +188,7 @@ struct AutoLiteratureReviewView: View {
         }
         
         do {
-            try nlVM.analyse(for: thesis, from: citation, depth: Int((depth > 500 ? 0 : depth)))
+            try analysisVM.analyse(for: thesis, from: citation, depth: Int((depth > 500 ? 0 : depth)))
         } catch {
             print(error)
             isLibraryEmpty = true
