@@ -19,7 +19,7 @@ import UniformTypeIdentifiers
 
 struct AutoLiteratureReviewView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
-    @EnvironmentObject var nlVM: NaturalLanguageViewModel
+    @EnvironmentObject var nlVM: AnalysisViewModel
     @State private var link: String = "" // TODO: download from link somehow
     private let cgfWidth: CGFloat = 5
     
@@ -37,7 +37,7 @@ struct AutoLiteratureReviewView: View {
     @State private var importFile: Bool = false
     private let importingContentTypes: [UTType] = [UTType(filenameExtension: "pdf")].compactMap { $0 }
     
-    @State private var depth: Double = 20.0 // Number of reference sentences to compare. If 0 we will compare all sentences.
+    @State private var depth: Double = 10.0 // Number of reference sentences to compare. If 0 we will compare all sentences.
     @State private var isLibraryEmpty: Bool = false
     
     
@@ -193,23 +193,8 @@ struct AutoLiteratureReviewView: View {
             print(error)
             isLibraryEmpty = true
         }
-        
-         // nlViewModel.nearestArgs(for: nlViewModel.citations(for: thesis, from: citation))
-//        nlVM.keywords(for: thesis)
-//        nlVM.keywords(for: citation)
-        //print("\nKeywords: \(nlVM.keywords)")
-        
-        
-        // TODO: everything in the nlVM needs to be on a separate thread, as these things can take a long time depending on source size
-        // TODO: make sure to put keywords on a new thread as well as we've seen it does freeze the main thread for a moment
-        
-        
-        
-        //tArgs = nlViewModel.args
-        //cArgs = nlViewModel.citations(for: citation, from: thesis) // nlViewModel.nearestArgs(for: nlViewModel.citations(for: citation, from: thesis))
-        
-        /* TODO: Remove all this temporary code
-         
+
+        /*
          For now I'll be testing the functionality of the natural language view model by testing it here.
          Will need to make a dictionary or list of all the texts in the repository, so that we can search through everything to find the relevant papers.
          */
@@ -222,7 +207,10 @@ struct AutoLiteratureReviewView: View {
     }
     
     private func loadDocs() -> [String] {
-        var documents: Array<String> = []
+        // TODO: this will probably need to be recursive, as we need to scan the entire directory and load all PDFs before loading all documents in child directories.
+        // This can be achieved with recursion. Probably don't need to worry about ordering, as we'll continue from where we left off, thus reaching all files eventually.
+        
+        var documents: Array<String> = [] // TODO: this should be a dictionary instead of an array; we need to put the title as the key
         dirVM.loadDir().forEach { file in
             if !file.isHidden() || dirVM.showHidden {
                 if let dir = file as? Directory {

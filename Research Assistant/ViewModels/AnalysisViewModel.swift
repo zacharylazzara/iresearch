@@ -8,10 +8,10 @@
 import Foundation
 import NaturalLanguage
 
-class NaturalLanguageViewModel: ObservableObject {
+class AnalysisViewModel: ObservableObject {
     private let language:NLLanguage
-    private let artifacts = [("- ", "")] // Artifacts should be replaced by the associated feature; i.e., (artififact, replacement)
-    private let stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now", "per"]
+    private let artifacts: Array<(String, String)>
+    private let stopwords: Array<String>
     
     // TODO: Need to keep most of these functions off the main thread, as we may sometimes be working with a ton of data
     
@@ -19,9 +19,9 @@ class NaturalLanguageViewModel: ObservableObject {
     @Published public var percent: Int
     @Published public var totalCompares: Int
     @Published public var compareProgress: Int
-    @Published public var args: Array<Argument> = []
-    @Published public var keywordStr: String = "keyword (occurances)"
-    @Published public var analysisStarted: Bool = false
+    @Published public var args: Array<Argument>
+    @Published public var keywordStr: String
+    @Published public var analysisStarted: Bool
     
     public var keywordDictionary: Dictionary<String, Int> = [:]
     
@@ -31,6 +31,12 @@ class NaturalLanguageViewModel: ObservableObject {
         self.percent = 0
         self.totalCompares = 0
         self.compareProgress = 0
+        self.args = []
+        self.keywordStr = "keyword (occurances)"
+        self.analysisStarted = false
+        
+        self.artifacts = [("- ", "")] // Artifacts should be replaced by the associated feature; i.e., (artififact, replacement)
+        self.stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now", "per", "www", "com"]
     }
     
     private func sanitize(text: String) -> String {
@@ -41,7 +47,11 @@ class NaturalLanguageViewModel: ObservableObject {
         return sText
     }
     
-    func nearestArgs(for args: Array<Argument>, distanceThreshold: Double = 0.9) -> Array<Argument> {
+    func nearestArgs(for args: Array<Argument>, distanceThreshold: Double = 0.9) throws -> Array<Argument> {
+        if distanceThreshold < 0 {
+            throw AnalysisError.runtimeError("Distance threshold (\(distanceThreshold)) is out of range [0, infinity]") // TODO: verify distance range is indeed [0, infinity]
+        }
+        
         var nearestArgs: Array<Argument> = []
         args.forEach { arg in
             let nearestArg = arg.args.max(by: { c, _ in
@@ -65,10 +75,6 @@ class NaturalLanguageViewModel: ObservableObject {
         
         if depth < 0 {
             throw AnalysisError.runtimeError("Depth (\(depth)) is out of range [0, infinity]")
-        }
-        
-        if distanceThreshold < 0 {
-            throw AnalysisError.runtimeError("Distance threshold (\(distanceThreshold)) is out of range [0, infinity]") // TODO: verify distance range is indeed [0, infinity]
         }
         
         analysisStarted = true
@@ -206,7 +212,7 @@ class NaturalLanguageViewModel: ObservableObject {
         var words = tokenize(text: sDoc, by: .word)
         
         words.removeAll { word in
-            stopwords.contains(word.lowercased())
+            stopwords.contains(word.lowercased()) || Int(word) != nil || word.count < 4
         }
         
         let freqDic = words.reduce(into: [:]) { $0[$1.lowercased(), default: 0] += 1 } // From: https://stackoverflow.com/a/30545629/7653788
@@ -219,7 +225,7 @@ class NaturalLanguageViewModel: ObservableObject {
             }
         }
         
-        var count = 0 // TODO: verify we're actually getting top n and not n+1 or n-1
+        var count = 0
         
         keywordStr = ""
         keywordDictionary.sorted{ return $0.value > $1.value }.forEach { keyword in

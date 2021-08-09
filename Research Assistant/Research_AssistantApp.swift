@@ -11,7 +11,7 @@ import SwiftUI
 struct Research_AssistantApp: App {
     let persistenceController = PersistenceController.shared
     let directoryViewModel = DirectoryViewModel()
-    let naturalLanguageViewModel = NaturalLanguageViewModel()
+    let naturalLanguageViewModel = AnalysisViewModel()
     
     var body: some Scene {
         WindowGroup {
