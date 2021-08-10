@@ -141,7 +141,7 @@ struct AutoLiteratureReviewView: View {
                                         cArgView(cgfWidth: cgfWidth, cgfHeight: cgfHeight, arg: cArg).fixedSize(horizontal: false, vertical: true)
                                     }
                                 }
-                            }
+                            }.padding()
                         }
                     }
 //                    HStack(alignment: .center) {
