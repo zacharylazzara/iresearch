@@ -94,7 +94,7 @@ class AnalysisViewModel: ObservableObject {
         sentCapacity = sents1.count * maxDepth
         args.reserveCapacity(sentCapacity)
         
-        compareProgress = 0
+        compareProgress = 0 // TODO: for some reason we can exceed the progress expected?
         percent = 0
         
         let group = DispatchGroup()
@@ -137,7 +137,7 @@ class AnalysisViewModel: ObservableObject {
                         
                         print("\rAnalysis Progress: \(percent)% (\(compareProgress)/\(sentCapacity)), Depth: \(currentDepth)/\(maxDepth)")
                         
-                        if currentDepth > maxDepth {
+                        if currentDepth >= maxDepth {
                             print("Depth (\(maxDepth)) reached!")
                             break
                         }
