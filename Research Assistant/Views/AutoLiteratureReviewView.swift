@@ -81,7 +81,7 @@ struct AutoLiteratureReviewView: View {
                         Slider(value: $distance, in: 0...1)
                         HStack(alignment: .center) {
                             Text("Similarity Threshold:").bold()
-                            Text("\(distance < 0.5 ? "High" : distance < 0.8 ? "Medium" : "Low") reference similarity (\(Int((1 - distance) * 100))%)")
+                            Text("\(distance < 0.5 ? "High" : distance < 0.8 ? "Medium" : "Low") reference similarity (≥\(Int((1 - distance) * 100))%)")
                         }
                         Divider()
                         Button(action: { importFile = true }) {
@@ -95,7 +95,7 @@ struct AutoLiteratureReviewView: View {
                     Text("\(Int(depth)) Sentences")
                     Divider().frame(height: cgfHeight)
                     Text("Threshold:").bold()
-                    Text("\(Int((1 - distance) * 100))% Similarity")
+                    Text("≥\(Int((1 - distance) * 100))% Similarity")
                     Divider().frame(height: cgfHeight)
                     Text("Analysis Progress:").bold()
                     Text("\(analysisVM.percent)% (\(analysisVM.compareProgress)/\(analysisVM.sentCapacity))")
