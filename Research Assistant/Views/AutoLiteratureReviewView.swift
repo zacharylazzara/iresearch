@@ -79,7 +79,7 @@ struct AutoLiteratureReviewView: View {
                         }
                         Slider(value: $distance, in: 0...1)
                         HStack(alignment: .center) {
-                            Text("Reference Similarity:").bold()
+                            Text("Similarity Threshold:").bold()
                             Text("\(distance < 0.5 ? "High" : distance < 0.8 ? "Medium" : "Low") reference similarity (\(Int((1 - distance) * 100))%)")
                         }
                         Divider()
@@ -90,6 +90,11 @@ struct AutoLiteratureReviewView: View {
                 } else if analysisVM.percent >= 100 {
                     Text("Analysis Complete").bold()
                 } else {
+                    Text("Depth:").bold()
+                    Text("\(Int(depth)) Sentences,")
+                    Text("Threshold:").bold()
+                    Text("\(Int((1 - distance) * 100))% Similarity,")
+                    
                     Text("Analysis Progress:").bold()
                     Text("\(analysisVM.percent)% (\(analysisVM.compareProgress)/\(analysisVM.sentCapacity))")
                 }
