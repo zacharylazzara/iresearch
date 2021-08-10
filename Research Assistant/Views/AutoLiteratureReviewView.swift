@@ -334,11 +334,11 @@ struct cArgView: View {
                 
                 HStack(alignment: .center) {
                     Text("Sentiment:").bold()
-                    Text("\(arg.sentiment == 0 ? "Neutral" : arg.sentiment > 0 ? "Positive" : "Negative")\t")
+                    Text("\(arg.sentiment == 0 ? "Neutral" : arg.sentiment > 0 ? "Positive" : "Negative")")
                     
                     Divider().frame(height: cgfHeight)
                     Text("Similarity:").bold()
-                    Text("\(arg.distance! < 0.5 ? "High" : arg.distance! < 0.8 ? "Medium" : "Low") (\(Int((1 - arg.distance!) * 100))%)\t")
+                    Text("\(arg.distance! < 0.5 ? "High" : arg.distance! < 0.8 ? "Medium" : "Low") (\(Int((1 - arg.distance!) * 100))%)")
                     
                     Divider().frame(height: cgfHeight)
                     Text("Supporting:").bold()

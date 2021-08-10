@@ -77,15 +77,24 @@ class AnalysisViewModel: ObservableObject {
         
         analysisStarted = true
         let sents1 = tokenize(text: doc1)
-        let sents2 = tokenize(text: doc2)
+        var sents2 = tokenize(text: doc2)
         let maxDepth: Int
         
         switch depth {
         case 0:
             maxDepth = sents2.count
         default:
-            if depth < sents2.count {
+            if depth < sents2.count { // We'll want a random sample from sents2 if we have a depth constraint so that searches can go beyond the first few sentences
                 maxDepth = depth
+                
+                var sents2Randomized: Array<String> = []
+                sents2Randomized.reserveCapacity(maxDepth)
+                
+                (0..<maxDepth).forEach { _ in
+                    sents2Randomized.append(sents2[Int.random(in: sents2.indices)])
+                }
+                
+                sents2 = sents2Randomized
             } else {
                 maxDepth = sents2.count
             }
