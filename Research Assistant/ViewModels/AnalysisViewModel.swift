@@ -45,7 +45,7 @@ class AnalysisViewModel: ObservableObject {
         return sText
     }
     
-    func nearestArgs(for args: Array<Argument>, distanceThreshold: Double = 0.9) throws -> Array<Argument> {
+    func nearestArgs(for args: Array<Argument>, distanceThreshold: Double = 0.8) throws -> Array<Argument> {
         if distanceThreshold < 0 {
             throw AnalysisError.runtimeError("Distance threshold (\(distanceThreshold)) is out of range [0, infinity]") // TODO: verify distance range is indeed [0, infinity]
         }

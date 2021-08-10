@@ -38,6 +38,7 @@ struct AutoLiteratureReviewView: View {
     private let importingContentTypes: [UTType] = [UTType(filenameExtension: "pdf")].compactMap { $0 }
     
     @State private var depth: Double = 10.0 // Number of reference sentences to compare. If 0 we will compare all sentences.
+    @State private var distance: Double = 0.9 // How simimlar should citaitons be; closer to 0 is more similar
     @State private var isLibraryEmpty: Bool = false
     
     
@@ -75,6 +76,11 @@ struct AutoLiteratureReviewView: View {
                         HStack(alignment: .center) {
                             Text("Analysis Depth:").bold()
                             Text("\(depth > 500 ? "All" : String(Int(depth))) reference sentences")
+                        }
+                        Slider(value: $distance, in: 0...1)
+                        HStack(alignment: .center) {
+                            Text("Reference Similarity:").bold()
+                            Text("\(distance < 0.5 ? "High" : distance < 0.8 ? "Medium" : "Low") reference similarity (\(Int((1 - distance) * 100))%)")
                         }
                         Divider()
                         Button(action: { importFile = true }) {
@@ -188,7 +194,7 @@ struct AutoLiteratureReviewView: View {
         }
         
         do {
-            try analysisVM.analyse(for: thesis, from: citation, depth: Int((depth > 500 ? 0 : depth)))
+            try analysisVM.analyse(for: thesis, from: citation, depth: Int((depth > 500 ? 0 : depth)), distanceThreshold: distance)
         } catch {
             print(error)
             isLibraryEmpty = true
@@ -324,8 +330,8 @@ struct cArgView: View {
                     Text("\(arg.sentiment == 0 ? "Neutral" : arg.sentiment > 0 ? "Positive" : "Negative")\t")
                     
                     Divider().frame(height: cgfHeight)
-                    Text("Relevance:").bold()
-                    Text("\(arg.distance! < 0.5 ? "High" : arg.distance! < 1 ? "Medium" : "Low")\t")
+                    Text("Similarity:").bold()
+                    Text("\(arg.distance! < 0.5 ? "High" : arg.distance! < 0.8 ? "Medium" : "Low") (\(Int((1 - arg.distance!) * 100))%)\t")
                     
                     Divider().frame(height: cgfHeight)
                     Text("Supporting:").bold()
