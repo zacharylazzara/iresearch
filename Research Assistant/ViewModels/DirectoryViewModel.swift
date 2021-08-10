@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import PDFKit
 
 /* TODO:
  - Load PDFs from local storage
@@ -139,7 +140,37 @@ class DirectoryViewModel: ObservableObject {
     }
     
     
-    
+    func upload(pdf: PDFDocument) { // We have a lot of duplicate code here shared with the DirectoryViewModel; we should try to put this stuff in a single place if possible
+        let fm = FileManager.default
+        let documents = AppGroup.documents.containerURL//AppGroup.root.containerURL.appendingPathComponent("Library", isDirectory: true).appendingPathComponent("Papers", isDirectory: true)
+//        var pdfDoc: PDFDocument = pdf
+        
+        do {
+            let files = try fm.contentsOfDirectory(at: documents, includingPropertiesForKeys: nil)
+            print("Found: \(files)")
+            
+            // TODO: we should ask the user what to do when a conflict is found (for now, just auto-rename)
+            
+            var uName = pdf.documentURL!.lastPathComponent
+            var collisions = 0
+            
+            while files.contains(where: {file in file.lastPathComponent == uName}) {
+                uName = pdf.documentURL!.lastPathComponent
+                collisions += 1
+                uName = "(\(collisions))\(uName)"
+            }
+            
+            pdf.write(to: documents.appendingPathComponent(uName))
+            
+            do {
+                print("Found (after writing): \(try fm.contentsOfDirectory(at: documents, includingPropertiesForKeys: nil))")
+            } catch {
+                print(error)
+            }
+        } catch {
+            print(error)
+        }
+    }
     
     
     

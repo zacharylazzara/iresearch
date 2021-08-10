@@ -6,10 +6,14 @@
 //
 
 import SwiftUI
+import PDFKit
+import UniformTypeIdentifiers
 
 struct DirectoryView: View {
     @EnvironmentObject var dirVM: DirectoryViewModel
     @State private var viewDirContents: Bool = false
+    @State private var importFile: Bool = false
+    private let importingContentTypes: [UTType] = [UTType(filenameExtension: "pdf")].compactMap { $0 }
     
     // TODO: sometimes when visiting a directory the view doesn't update to the new directory's contents
     
@@ -37,8 +41,19 @@ struct DirectoryView: View {
             viewDirContents = false
         }
         
-        
         Divider()
+        
+        Button(action: { importFile = true }) {
+            Text("\(Image(systemName: "arrow.up.doc")) Upload Document")
+        }.fileImporter(isPresented: $importFile, allowedContentTypes: importingContentTypes, onCompletion: {file in
+            do {
+                if let pdf = PDFDocument(url: try file.get()) {
+                    dirVM.upload(pdf: pdf)
+                }
+            } catch {
+                print(error)
+            }
+        })
         
         Button(action: { dirVM.createDir() }) {
             Text("\(Image(systemName: "folder.badge.plus")) Create Directory")

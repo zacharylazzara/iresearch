@@ -66,7 +66,7 @@ class AnalysisViewModel: ObservableObject {
         return nearestArgs
     }
     
-    func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, depth: Int = 0, distanceThreshold: Double = 0.9) throws {
+    func analyse(for doc1: String, from doc2: String, nKeywords: Int = 50, depth: Int = 0, distanceThreshold: Double = 0.8) throws {
         if doc1.isEmpty || doc2.isEmpty {
             throw AnalysisError.runtimeError("Empty thesis or reference document(s)")
         }

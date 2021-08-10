@@ -25,7 +25,7 @@ struct SidebarView: View {
             Divider()
             
             Group {
-                NavigationLink(destination: AutoLiteratureReviewView(), tag: 2, selection: $selection) { Text("\(Image(systemName: "tray.and.arrow.down.fill")) Auto-Literature Review") }
+                NavigationLink(destination: AutoLiteratureReviewView(), tag: 2, selection: $selection) { Text("\(Image(systemName: "books.vertical.fill")) Auto-Literature Review") }
                 NavigationLink(destination: CitationGeneratorView(), tag: 3, selection: $selection) { Text("\(Image(systemName: "text.quote")) Generate Citations") }
                 NavigationLink(destination: NotesView(), tag: 4, selection: $selection) { Text("\(Image(systemName: "rectangle.and.paperclip")) Notes") }
                 NavigationLink(destination: BookmarksView(), tag: 5, selection: $selection) { Text("\(Image(systemName: "bookmark.fill")) Bookmarks") }
