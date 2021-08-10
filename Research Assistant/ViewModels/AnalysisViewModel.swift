@@ -76,9 +76,17 @@ class AnalysisViewModel: ObservableObject {
         }
         
         analysisStarted = true
-        let sents1 = tokenize(text: doc1)
+        var sents1 = tokenize(text: doc1)
         var sents2 = tokenize(text: doc2)
         let maxDepth: Int
+        
+        sents1.removeAll { sent in
+            stopwords.contains(sent.lowercased()) || Int(sent) != nil || sent.count < 3
+        }
+        
+        sents2.removeAll { sent in
+            stopwords.contains(sent.lowercased()) || Int(sent) != nil || sent.count < 3
+        }
         
         switch depth {
         case 0:
