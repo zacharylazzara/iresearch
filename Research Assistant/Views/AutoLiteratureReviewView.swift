@@ -22,6 +22,7 @@ struct AutoLiteratureReviewView: View {
     @EnvironmentObject var analysisVM: AnalysisViewModel
     @State private var link: String = "" // TODO: download from link somehow
     private let cgfWidth: CGFloat = 5
+    private let cgfHeight: CGFloat = 20
     
     // From: http://dx.doi.org/10.1016/j.neunet.2016.11.003
     // Using this text for testing purposes for now.
@@ -91,10 +92,11 @@ struct AutoLiteratureReviewView: View {
                     Text("Analysis Complete").bold()
                 } else {
                     Text("Depth:").bold()
-                    Text("\(Int(depth)) Sentences,")
+                    Text("\(Int(depth)) Sentences")
+                    Divider().frame(height: cgfHeight)
                     Text("Threshold:").bold()
-                    Text("\(Int((1 - distance) * 100))% Similarity,")
-                    
+                    Text("\(Int((1 - distance) * 100))% Similarity")
+                    Divider().frame(height: cgfHeight)
                     Text("Analysis Progress:").bold()
                     Text("\(analysisVM.percent)% (\(analysisVM.compareProgress)/\(analysisVM.sentCapacity))")
                 }
@@ -136,7 +138,7 @@ struct AutoLiteratureReviewView: View {
                                     Divider()
                                     Text("Citation Statement(s):").bold()
                                     ForEach(tArg.args, id: \.self) { cArg in
-                                        cArgView(cgfWidth: cgfWidth, arg: cArg).fixedSize(horizontal: false, vertical: true)
+                                        cArgView(cgfWidth: cgfWidth, cgfHeight: cgfHeight, arg: cArg).fixedSize(horizontal: false, vertical: true)
                                     }
                                 }
                             }
@@ -316,7 +318,7 @@ struct tArgView: View {
 
 struct cArgView: View {
     let cgfWidth: CGFloat
-    let cgfHeight: CGFloat = 20
+    let cgfHeight: CGFloat
     var arg: Argument
     
     var body: some View {
